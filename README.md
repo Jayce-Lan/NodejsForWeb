@@ -172,3 +172,23 @@ new Vue({
   - *package-lock.json* 
   - *webpack.config.js* 
 
+
+
+##### 打包后的运行
+
+- 打包完成后，项目下会生成一个 *dist* 文件夹，其中的 *build.js* 就是被打包的 js 文件
+- 在 *dist* 文件夹下创建一个 *index.html* 文件，随后在 **body 标签内** 引入*build.js* 文件即可
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="build.js"></script>
+</body>
+</html>
+```
+
