@@ -77,3 +77,8 @@ Is this OK? (yes)
 
 - 随后运行如下命令 `npm install express` 
 - 项目内会出现一个 *package.json* 文件，并且 *dependencies* 模块会有 *express* 选项
+
+
+
+#### 手动搭建一个Vue项目
+
