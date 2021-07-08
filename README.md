@@ -192,3 +192,66 @@ new Vue({
 </html>
 ```
 
+
+
+#### 项目后台技术 *Express*
+
+##### 创建 *Express* 应用框架
+
+> 采用官方提供的应用程序生成器express-generator来快速创建一个应用的框架
+
+- 运行命令行，全局安装 `npm install express-generator -g` 
+- 全局安装后，使用命令行 `express -h` 确认是否安装成功
+- 使用 *express* 创建项目 `express --no-view myexpressapp` （myexpressapp 为项目名）
+- 创建成功后效果如下
+
+```shell
+create : myexpressapp\
+create : myexpressapp\public\
+create : myexpressapp\public\javascripts\
+create : myexpressapp\public\images\
+create : myexpressapp\public\stylesheets\
+create : myexpressapp\public\stylesheets\style.css
+create : myexpressapp\routes\
+create : myexpressapp\routes\index.js
+create : myexpressapp\routes\users.js
+create : myexpressapp\public\index.html
+create : myexpressapp\app.js
+create : myexpressapp\package.json
+create : myexpressapp\bin\
+create : myexpressapp\bin\www
+
+change directory:
+> cd myexpressapp
+
+install dependencies:
+> npm install
+
+run the app:
+> SET DEBUG=myexpressapp:* & npm start
+```
+
+- 随后初始化并运行项目
+- 项目启动后，控制台如下
+
+```shell
+myexpressapp:server Listening on port 3000 +0ms
+GET / 200 4.655 ms - 176
+GET /stylesheets/style.css 200 1.975 ms - 111
+GET /favicon.ico 404 1.643 ms - 150
+```
+
+- 使用 127.0.0.1:3000 启动项目
+
+
+
+##### *Express* 提供的路由
+
+> Express提供了路由，通过定义路由，可以设计不同的URI地址，可以支持HTTP的各个不同方法（包括GET、POST和其他请求方式）
+
+```javascript
+router.get('/', function(req, res, next) {
+  res.send("Hello World!")
+});
+```
+
