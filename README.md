@@ -82,3 +82,93 @@ Is this OK? (yes)
 
 #### 手动搭建一个Vue项目
 
+##### 具体步骤
+
+- 首先搭建一个项目，并使用 `npm init` 初始化
+- 安装 webpack ，使用如下命令 `npm install webpack`
+- 安装 webpack 命令工具，使用如下命令 `npm install webpack-cli`
+- 安装 Vue.js ，使用如下命令：`npm install vue`
+- 安装 vue-loader 和 vue-template-compiler ，这样才可以让Webpack识别Vue.js 使用如下命令：`npm install vue-loader`  以及 `npm install vue-template-compiler` 
+- 安装完成后 *package.json* 如下：
+
+```json
+//注意！此处的vue-loader 建议使用 15.7.0  版本，否则文件下无 vue-loader/lib/plugin 
+{
+  "name": "testvue",
+  "version": "1.0.0",
+  "description": "test Vue project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+      //配置 build 使得命令行可以直接使用 npm run build 打包，否则需要使用 webpack --config webpack.config.js命令
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "Jayce",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "^2.6.14",
+    "vue-loader": "^15.7.0",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^5.43.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
+```
+
+- 新建一个 *webpack.config.js* ，并引入 vue-loader 
+
+```js
+const path = require("path")
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
+
+module.exports = {
+    //指定入口文件
+    entry: path.join(__dirname, "app.js"),
+    //指定输出文件的位置和名称
+    output: {
+        path: path.join(__dirname, "dist"),
+        filename: "build.js"
+    },
+    plugins: [
+        //在使用新版的vue-loader时，必须引入该插件
+        new VueLoaderPlugin()
+    ],
+    module: {
+        //指定不同格式的规则
+        rules: [
+            //解析 .vue 文件
+            {
+                test: /\.vue$/,
+                loader: "vue-loader"
+            }
+        ]
+    }
+}
+```
+
+- 配置 *app.js* 将文件挂载到 root 根节点之中
+
+```js
+//引入vue
+import Vue from "vue"
+import HelloWorld from "./HelloWorld.vue"
+
+const root = document.createElement("div")
+document.body.appendChild(root)
+
+//mount 将 HelloWorld 模块挂载到 root 根节点中
+new Vue({
+    render: (h) => h(HelloWorld)
+}).$mount(root)
+```
+
+##### 最后的项目目录
+
+- testVue
+  - node_modules【依赖文件夹】
+  - *app.js* 
+  - *HelloWorld.vue* 
+  - *package.json* 
+  - *package-lock.json* 
+  - *webpack.config.js* 
+
