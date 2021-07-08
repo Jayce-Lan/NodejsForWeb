@@ -255,3 +255,65 @@ router.get('/', function(req, res, next) {
 });
 ```
 
+
+
+## Webpack
+
+> Webpack对于操作系统没有要求，使用Windows、Mac、Linux操作系统均可。它唯一的依赖就是Node.js
+
+### 构建一个 *webpack* 项目
+
+#### 初始化项目
+
+- 创建项目文件夹并使用 `npm init` 初始化
+- 随后使用 `npm install webpack webpack-cli --save-dev` 安装webpack依赖以及webpack命令工具
+- 打包命令：`npx webpack --entry=./index.js --output-filename=bundle.js --mode=development`
+  - 也可以在 *package.json* 文件中的 *scripts* 模块中使用如下属性，便于快捷打包：
+  - `"build": "webpack --entry=./index.js --output-filename=bundle.js --mode=development"`
+- 文件目录：
+  - mywebpackapp
+    - node_modules【依赖文件夹】
+    - dist【打包文件夹】
+    - *add-content.js*
+    - *index.html*
+    - *index.js*
+    - *package.json* 
+    - *package-lock.json* 
+
+
+
+#### 使用配置文件
+
+> Webpack的默认配置文件为webpack.config.js（也可以使用其他文件名，需要使用命令行参数指定）
+
+```js
+module.exports = {
+    // 配置主文件 js 的路径，用于读取
+    entry: './src/index.js',
+    output: {
+        //配置打包文件名
+        filename: 'bundle.js',
+    },
+    mode: 'development'
+}
+```
+
+
+
+#### webpack-dev-server
+
+> 其实Webpack社区已经为我们提供了一个便捷的本地开发工具——webpack-dev-server
+
+- 安装使用：`npm install webpack-dev-server --save-dev`
+- 安装指令中的 **--save-dev **参数是将 webpack-dev-server 作为工程的 devDependencies （开发环境依赖）记录在 *package.json* 中
+- 值得注意的是，以下选项不建议版本过高
+
+```js
+"webpack": "4.29.4",
+"webpack-cli": "3.2.3",
+"webpack-dev-server": "3.1.14"
+```
+
+
+
+#### 模块打包
