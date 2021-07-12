@@ -1,0 +1,71 @@
+body {
+    color: black;
+    font-family: Consolas;
+}
+
+h1 {
+    color: #2f4f4f;
+    margin-bottom: 10px;
+}
+
+#main-nav {
+    margin-top: 10px;
+    list-style: none;
+    padding-left: 0;
+}
+
+#main-nav li {
+    display: inline-block; /*让列表水平排列*/
+}
+
+/*
+.featured {
+    background-color: orange ! important; !*使用!important声明优先级，使之优先级高于上面的id+标签*!
+}*/
+
+/*修改为更高的优先级*/
+
+.nav a {
+    color: white;
+    background-color: #13a4a4;
+    padding: 5px;
+    border-radius: 2px;
+    text-decoration: none;  /*消除a标签下划线*/
+}
+
+a.featured {
+    background-color: orange;
+}
+
+/*链表样式*/
+/*
+a:link {
+    color: blue;
+    text-decoration: none;
+}
+
+a:visited {
+    color: purple;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    color: red;
+}*/
+
+.footer {
+    color: #666;
+    background-color: #ccc;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 14px;
+}
+
+.footer a {
+    /*color: inherit; !*从页脚继承文本颜色*!*/
+    color: initial; /*设置回初始值，等价于color: black;*/
+    text-decoration: none;
+}
