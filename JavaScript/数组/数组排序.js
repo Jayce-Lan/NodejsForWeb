@@ -14,6 +14,12 @@ function reverseStr (str) {
     return reverse_str;
 }
 
+function reverseStrJoin (str) {
+    return str.split("").reverse().join("");
+}
+
+console.log(reverseStrJoin(str))
+
 console.log(reverseStr(str));
 
 // 数组排序

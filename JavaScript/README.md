@@ -389,6 +389,12 @@ function reverseStr (str) {
 }
 
 console.log(reverseStr(str));
+
+function reverseStrJoin (str) {
+    return str.split("").reverse().join("");
+}
+
+console.log(reverseStrJoin(str))
 ```
 
 
@@ -618,4 +624,8 @@ console.log(sum) // !WorldHello
     console.log(strings); // [ 'jack', 'tacl', 'heaccc' ]
 }
 ```
+
+
+
+### 二维数组和多维数组
 
