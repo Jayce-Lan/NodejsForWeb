@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            height: 100%;
+        }
+        .body {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            height: 160px;
+            width: 160px;
+        }
+
+        .up, .dro {
+            height: 50%;
+            width: 50%;
+            background-color: lightpink;
+            float: left;
+        }
+        .up {
+            border-top-right-radius: 40px;
+            border-top-left-radius: 40px;
+        }
+
+        .dor-l {
+            border-bottom-left-radius: 80px;
+            /*background-color: #fff;*/
+        }
+
+        .dor-r {
+            border-bottom-right-radius: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="body">
+        <div class="up"></div>
+        <div class="up"></div>
+        <div class="dro dor-l"></div>
+        <div class="dro dor-r"></div>
+    </div>
+</body>
+</html>
