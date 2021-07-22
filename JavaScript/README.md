@@ -544,3 +544,78 @@ console.log(sum) // !WorldHello
 
 
 #### 生成新数组的迭代方法
+
+##### *map()*
+
+> map()和forEach()相像，对数组中的每个元素使用某个函数。两者的区别是map()返回一个新的数组，该数组的元素是对原有元素应用某个函数得到的结果
+
+```js
+{
+    function showItem(item) {
+        return item;
+    }
+
+    let nums = [1, 2, 3, 4, 5, 6];
+
+    const numsMap = nums.map(showItem);
+    console.log(numsMap); // [ 1, 2, 3, 4, 5, 6 ]
+}
+{
+    function showItem(item) {
+        return item[0];
+    }
+
+    let arr = ["jack", "fly", "tom"];
+    const arrMap = arr.map(showItem);
+    console.log(arrMap.join("")); // jft
+}
+```
+
+
+
+##### *filter()*
+
+> filter()和every()类似，传入一个返回值为布尔类型的函数。和every()方法不同的是，当对数组中的所有元素应用该函数，结果均为true时，该方法并不返回true，而是返回一个新数组，该数组包含应用该函数后结果为true的元素
+
+```js
+{
+    let nums = new Array();
+    for (let i = 0; i < 20; i++) {
+        nums[i] = i + 1;
+    }
+
+    function isEven(num) {
+        return num % 2 === 0;
+    }
+
+    function isObb(num) {
+        return num % 2 !== 0;
+    }
+
+    const filterEven = nums.filter(isEven);
+    console.log(filterEven); // 只输出偶数
+
+    const filterObb = nums.filter(isObb);
+    console.log(filterObb); // 只输出奇数
+}
+```
+
+使用此方法过滤字符串数组
+
+```js
+// 使用filter过滤字符串
+{
+    function afterc(item) {
+        if (item.indexOf("ac") > -1) {
+            return true;
+        }
+        return false;
+    }
+
+    let arr = ["jack", "tacl", "good", "hello", "heaccc"];
+
+    const strings = arr.filter(afterc);
+    console.log(strings); // [ 'jack', 'tacl', 'heaccc' ]
+}
+```
+
