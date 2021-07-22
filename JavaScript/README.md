@@ -438,3 +438,109 @@ nums = [1, 3, 2, 200, 6, 400, 4];
 console.log(nums.sort(compare).toString());
 ```
 
+
+
+### 迭代器方法
+
+#### 不生成新数组的迭代方法
+
+##### *forEach()*
+
+> 该方法接受一个函数作为参数，对数组中的每个元素使用该函数
+
+```js
+function square(num) {
+    console.log(num, num * num);
+}
+
+var nums = [1, 2, 3, 4, 5];
+nums.forEach(square);
+```
+
+
+
+##### *every()*
+
+> 该方法接受一个返回值为布尔类型的函数，对数组中的每个元素使用该函数。如果**对于所有的元素，该函数均返回true，则该方法返回true**
+
+```js
+function isEven(num) {
+    return num % 2 === 0;
+}
+
+nums = [1, 2, 4, 6, 8, 10];
+var evenFlag = nums.every(isEven);
+if (evenFlag) {
+    console.log("数组内全为偶数")
+} else {
+    console.log("数组内不全为偶数")
+}
+```
+
+
+
+##### *some()*
+
+> 此方法也接受一个返回值为布尔类型的函数，**只要有一个元素使得该函数返回true，该方法就返回true**
+
+```js
+const nums = [1, 3, 5 , 7, 9];
+function someFunc (arr) {
+    let evenFlag = nums.some(isEven);
+    if (evenFlag) {
+        return "数组中有偶数元素";
+    } else {
+        return "数组中无偶数元素";
+    }
+}
+
+console.log(someFunc(nums));
+```
+
+
+
+##### *reduce()*
+
+> 此方法接受一个函数，返回一个值。该方法会从一个累加值开始，不断对累加值和数组中的后续元素调用该函数，直到数组中的最后一个元素，最后返回得到的累加值
+
+```js
+nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function add(runningTotal, currentValue) {
+    return runningTotal + currentValue;
+}
+
+var sum = nums.reduce(add);
+console.log(sum) // 55
+```
+
+reduce()方法也可以用来将数组中的元素连接成一个长的字符串
+
+```js
+nums = ['Hello', 'World', "!"]
+function add(runningTotal, currentValue) {
+    return runningTotal + currentValue;
+}
+sum = nums.reduce(add);
+console.log(sum) // HelloWorld!
+```
+
+
+
+##### *reduceRight()*
+
+> JavaScript还提供了reduceRight()方法，和reduce()方法不同，它是从右到左执行
+
+```js
+function add(runningTotal, currentValue) {
+    return runningTotal + currentValue;
+}
+
+nums = ['Hello', 'World', "!"]
+sum = nums.reduceRight(add);
+console.log(sum) // !WorldHello
+```
+
+
+
+#### 生成新数组的迭代方法
