@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="./index.css">
+    <style>
+        .box{
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            margin: auto;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .d1{
+            width: 300px;
+            height: 200px;
+            background-color: orange;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(900px) rotateX(45deg) rotateY(10deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .d1::before,.d1::after
+        {
+            content: '';
+            background-color:lightpink;
+            width: 50%;
+            height: 100%;
+            position:absolute;
+            border-right: solid 2px lightpink;
+            box-sizing: border-box;
+        }
+        .d1::before{
+            content: '小蒋';
+            color: white;
+            left: 0;
+            top: 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            transition: 2s;
+            transform-origin: left;
+
+        }
+        .d1::after{
+            content: '亲启';
+            color: white;
+            right: 0;
+            top: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            transition: 2s;
+            transform-origin: right;
+        }
+
+        .d1:hover::before{
+            transform:rotateY(-180deg);
+        }
+        .d1:hover::after{
+            transform:rotateY(180deg);
+        }
+
+
+    </style>
+</head>
+<body class='me'>
+<div class='box'>
+    <div class='d1'>
+        小蒋生日快乐!
+        <br/>
+        接下来的日子要天天开心，事事顺意
+        <br/>
+        &nbsp;&nbsp;--爱你的小蓝
+    </div>
+</div>
+
+</body>
+</html>

@@ -629,3 +629,78 @@ console.log(sum) // !WorldHello
 
 ### 二维数组和多维数组
 
+> JavaScript只支持一维数组，但是通过在数组里保存数组元素的方式，可以轻松创建多维数组
+
+
+
+#### 创建二维数组
+
+> 二维数组类似一种由行和列构成的数据表格。在JavaScript中创建二维数组，需要先创建一个数组，然后让数组的每个元素也是一个数组
+
+```js
+{
+    function createArr(numrows, numcols, initial) {
+        let arr = [];
+        for (let i = 0; i < numrows; i++) {
+            let columns = [];
+            for (let j = 0; j < numcols; j ++) {
+                columns[j] = initial;
+            }
+            arr[i] = columns;
+        }
+        return arr;
+    }
+
+    let arr = createArr(3, 4, 1);
+    console.log(arr); // [ [ 1, 1, 1, 1 ], [ 1, 1, 1, 1 ], [ 1, 1, 1, 1 ] ]
+    arr[2][3] = 'Test';
+    console.log(arr[2][3]); // Test
+}
+```
+
+
+
+#### 处理二维数组
+
+> 处理二维数组中的元素，有两种最基本的方式：按列访问和按行访问
+
+```js
+let grades = [[89, 77, 78], [76, 82, 81], [91, 94, 89]];
+
+let total = 0;
+let average = 0.0;
+
+for (let row  = 0; row < grades.length; row++) {
+    for (let col = 0; col < grades[row].length; col++) {
+        total += grades[row][col];
+    }
+    average = total / grades[row].length;
+    console.log("第" + (row + 1) + "行的平均值为：" + average);
+    total = 0;
+    average = 0.0;
+}
+```
+
+有时，会发生数组参差不齐的情况：
+
+```js
+// let grades = [[89, 77, 78], [76, 82, 81], [91, 94, 89]];
+
+let grades = [[1, 2, 3], [4, 5], [6, 7, 8, 9]];
+
+let total = 0;
+let average = 0.0;
+
+for (let row  = 0; row < grades.length; row++) {
+    for (let col = 0; col < grades[row].length; col++) {
+        total += grades[row][col];
+    }
+    average = total / grades[row].length;
+    console.log("第" + (row + 1) + "行的平均值为："
+                // 结果保留两位小数
+                + average.toFixed(2));
+    total = 0;
+    average = 0.0;
+}
+```
+
