@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <style>
+        .testClass1 {
+            color: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="img-div"></div>
+</body>
+    <script>
+        function getName(user) {
+            return user.firstName + "." + user.lastName;
+        }
+
+        const user = {
+            firstName: "Jack",
+            lastName: "Long"
+        }
+
+        const element = React.createElement("h1", {className: "testClass1"}, `Hello, ${getName(user)}`);
+        const myImg = React.createElement("img", {src: "../img/哆啦A梦.jpeg"}, null);
+
+        ReactDOM.render(element, document.getElementById("app"));
+        ReactDOM.render(myImg, document.getElementById("img-div"));
+    </script>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>组件&Props</title>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="welFunc"></div>
+    <div id="welClazz"></div>
+</body>
+    <script type="text/jsx">
+        /**
+         * 定义组件最简单的方式是使用函数
+         * @param props
+         * @constructor
+         */
+        function WelcomeFunc(props) {
+            return <h3>WelcomeFunc, {props.name}</h3>;
+        }
+
+        const welFunc = <WelcomeFunc name="Jack"/>
+
+        ReactDOM.render(welFunc, document.getElementById("welFunc"));
+
+        // 也可以使用 es6 的 class
+        class WelcomeClazz extends React.Component {
+            render() {
+                return <h3>WelcomeClazz, {this.props.name}</h3>
+            }
+        }
+
+        const welClazz = <WelcomeClazz name="Jayce"/>
+        ReactDOM.render(welClazz, document.getElementById("welClazz"));
+    </script>
+</html>
