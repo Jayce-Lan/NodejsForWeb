@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>em&rem</title>
+    <style>
+        body {
+            font-size: 16px;
+        }
+
+        .padded {
+            font-size: 16px;
+            padding: 2em; /*设置内边距为font-size*/
+        }
+
+        .box {
+            padding: 1em;
+            border-radius: 1em;
+            background-color: skyblue;
+            color: #fff;
+        }
+
+        .box-small {
+            font-size: 12px;
+        }
+
+        .box-large {
+            font-size: 18px;
+        }
+
+        .testEm {
+            font-size: 1.2em;
+        }
+
+        /* 两者大小会不相等，因为font-size被做了调整 */
+        .testEmAll {
+            padding: 1em;
+            border-radius: 1em;
+            background-color: skyblue;
+            color: #fff;
+        }
+
+        .font-small {
+            margin-top: 30px;
+        }
+
+        ul {
+            font-size: .8em;
+        }
+
+    </style>
+</head>
+<body>
+    <hr/>
+    <div class="padded">
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+        测试文字测试文字测试文字测文字
+    </div>
+    <span class="box box-small">small</span>
+    <span class="box box-large">large</span>
+
+    <div style="margin-top: 3em">
+        <span class="testEmAll">测试文字</span>
+        <span class="testEmAll testEm">测试文字</span>
+    </div>
+
+    <!-- 做字号缩小 -->
+    <ul class="font-small">
+        <li>测试数据
+            <ul>
+                <li>
+                    测试数据
+                    <ul>
+                        <li>测试数据
+                            <ul>
+                                <li>测试数据</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</body>
+</html>
