@@ -1,813 +1,296 @@
 # JavaScript
 
-## JavaScript对数组的定义
+## 语言基础
 
-> 数组的标准定义是：一个存储元素的线性集合（collection），元素可以通过索引来任意存取，索引通常是数字，用来计算元素之间存储位置的偏移量。几乎所有的编程语言都有类似的数据结构。然而JavaScript的数组却略有不同
+### 数据类型
+
+> ECMAScript有6种简单数据类型（也称为原始类型）: Undefined、Null、Boolean、Number、String和Symbol。Symbol（符号）是ECMAScript 6新增的。还有一种复杂数据类型叫Object（对象）。Object是一种无序名值对的集合。因为在ECMAScript中不能定义自己的数据类型，所有值都可以用上述7种数据类型之一来表示。只有7种数据类型似乎不足以表示全部数据。但ECMAScript的数据类型很灵活，一种数据类型可以当作多种数据类型来使用
+
+#### *typeof* 操作符
+
+```js
+let msg = "String msg";
+let booleanValue = true;
+let num = 90;
+
+let obj = {
+    name: "Tom",
+    age: 10,
+    show: function (msg) {
+        return "Hello, " + this.name;
+    }
+}
+
+console.log("msg", typeof msg);
+console.log("booleanValue", typeof booleanValue);
+console.log("num", typeof num);
+console.log("obj", typeof obj); // object
+console.log("obj", typeof obj.show); // function
+```
+
+
+
+#### *Undefined* 类型
+
+> Undefined类型只有一个值，就是特殊值undefined。当使用var或let声明了变量但没有初始化时，就相当于给变量赋予了undefined值
 >
-> JavaScript中的数组是一种特殊的对象，用来表示偏移量的索引是该对象的属性，索引可能是整数。然而，这些数字索引在内部被转换为字符串类型，这是因为JavaScript对象中的属性名必须是字符串。数组在JavaScript中只是一种特殊的对象，所以效率上不如其他语言中的数组高
+> 即使未初始化的变量会被自动赋予undefined值，但我们仍然建议在声明变量的同时进行初始化。这样，当typeof返回"undefined"时，你就会知道那是因为给定的变量尚未声明，而不是声明了但未初始化
+
+```js
+{
+    let msg;
+    console.log(msg === undefined); // true
+
+    msg = undefined;
+    console.log(msg === undefined); // true
+}
+
+{
+    let msg;
+    console.log(msg); // undefined
+    console.log(age); // 报错age is not defined
+}
+
+{
+    let msg;
+    if (msg) {
+        console.log("这里不会被执行");
+    }
+    if (!msg) {
+        console.log("这里会被执行");
+    }
+    if (age) {
+        console.log("这里会报错");
+    }
+}
+```
+
+
+
+#### *Null* 类型
+
+> Null类型同样只有一个值，即特殊值null。逻辑上讲，null值表示一个空对象指针，这也是给typeof传一个null会返回"object"的原因
+
+```js
+console.log(typeof null); // object
+```
+
+- 在定义将来要保存对象值的变量时，建议使用null来初始化，不要使用其他值。这样，只要检查这个变量的值是不是null就可以知道这个变量是否在后来被重新赋予了一个对象的引用
+- undefined值是由null值派生而来的，因此ECMA-262将它们定义为表面上相等
+- 用等于操作符（==）比较null和undefined始终返回true。但要注意，这个操作符会为了比较而转换它的操作数
+
+```js
+console.log(null == undefined); // true
+console.log(null === undefined); // false
+```
+
+
+
+#### *Boolean* 类型
+
+> Boolean 有两个字面值：true和false。这两个布尔值不同于数值，因此true不等于1，false不等于0
 >
-> JavaScript中的数组，严格来说应该称作对象，是特殊的JavaScript对象，在内部被归类为数组。由于Array在JavaScript中被当作对象，因此它有许多属性和方法可以在编程时使用
-
-
-
-### 创建数组
-
-javascript 创建数组的几种方式
+> 布尔值字面量true和false是区分大小写的，因此True和False（及其他大小混写形式）是有效的标识符，但不是布尔值
 
 ```js
-var arr1 = [];
-console.log("数组长度：", arr1.length); // 0
+let flag = true;
+    // let flag2 = True; // True is not defined
+```
 
-var arr2 = [1, 2, 3, 4, 5];
-console.log("数组长度：", arr2.length); // 5
+##### *Boolean()*
 
-var arr3 = new Array();
-console.log("数组长度：", arr3.length); // 0
+| 数据类型  | 转为true的值          | 转为false的值  |
+| --------- | --------------------- | -------------- |
+| Boolean   | true                  | false          |
+| String    | 非空字符串            | ""（空字符串） |
+| Number    | 非0对象（包括无穷值） | 0，NaN         |
+| Object    | 任意对象              | null           |
+| Undefined | N/A（不存在）         | undefined      |
 
-var arr4 = new Array(5)
-console.log("数组长度：", arr4.length); // 5
+```js
+console.log("boolean",Boolean(true)); // true
+console.log("boolean",Boolean(false)); // false
 
-var arr5 = new Array(1, 2, 3, 4, 5)
-console.log("数组长度：", arr5.length); // 5
+let stringValue = "";
+console.log("string",Boolean(stringValue)); // false
+stringValue = "Hello";
+console.log("string", Boolean(stringValue)); // true
+
+console.log("number", Boolean(0)); // false
+console.log("number", Boolean(NaN)); // false
+console.log("number", Boolean(1)); // true
+
+let obj = null;
+console.log("obj", Boolean(obj)); // false
+obj = {};
+console.log("obj", Boolean(obj)); // true
+obj.name = "Tome";
+console.log("obj", Boolean(obj)); // true
+
+console.log("undefined", Boolean(undefined)); // false
 ```
 
 
 
-#### 脚本语言的特性
+#### *Number* 类型
 
-> 在脚本语言里很常见的一个特性是，数组中的元素**不必是同一种数据类型**，这一点和很多编程语言不同
+> Number类型使用IEEE754格式表示整数和浮点值（在某些语言中也叫双精度值）。不同的数值类型相应地也有不同的数值字面量格式
 
 ```js
-var obj = [1, 'Test', true, null];
-console.log(obj.length); // 4
+let intNum = 55;
+console.log("intNum", intNum);
+
+let num = 0o70; // 八进制
+console.log("num", num); // 56
+
+num = 1.; // 小数点后没有数字，当作1处理
+console.log("num", num); // 1
 ```
 
 
 
-#### *Array.isArray(obj)* 判断对象是否为数组
+##### *Number* 的精度问题
 
-> 布尔类型返回值的方法，判断 *obj* 是否为数组
+- 浮点值的精确度最高可达17位小数，但在算术计算中远不如整数精确。例如，0.1加0.2得到的不是0.3，而是0.30000000000000004
+- 因此永远不要测试某个特定的浮点值
 
 ```js
-var num = 3;
-var obj = [1, 'Test', true, null];
-console.log(Array.isArray(num)); // false
-console.log(Array.isArray(obj)); // true
+console.log(.1 + .2); // 0.30000000000000004
+console.log(.15 + .15); // 0.3
+console.log((.1 * 100 + .2 * 100) / 100); // .3
 ```
 
 
 
-### 读写数组
+##### 取值范围（*isFinite()*）
 
-#### 数组的浅拷贝
-
-**直接使用 =** 的话会造成浅拷贝的问题，当我们**修改拷贝对象时**，**被拷贝对象也会被修改**，因为它们都指向同一个对象
+> 如果计算返回正Infinity或负Infinity，则该值将不能再进一步用于任何计算。这是因为Infinity没有可用于计算的数值表示形式。要确定一个值是不是有限大（即介于JavaScript能表示的最小值和最大值之间），可以使用isFinite()函数
 
 ```js
-var nums = [1, 2, 3, 4, 5];
-var copyNum = nums; // nums[0] = 1
-copyNum[0] = 100;
-console.log(nums[0]); // 100
+let num = Number.MAX_VALUE;
+let maxNum = num * 2;
+console.log(num + 1);
+console.log(isFinite(num)); // true
+console.log(isFinite(maxNum)); // false
+
+console.log(isFinite(Number.NEGATIVE_INFINITY)); // 获取正无限大值 false
+console.log(isFinite(Number.POSITIVE_INFINITY)); // 获取负无限大值 false
 ```
 
 
 
-#### 数组的深拷贝
+##### *NaN* 
 
-将数组逐个元素进行赋值，就不会发生浅拷贝的问题
+> 有一个特殊的数值叫NaN，意思是“不是数值”（Not a Number），用于表示本来要返回数值的操作失败了（而不是抛出错误）
+
+用0除任意数值在其他语言中通常都会导致错误，从而中止代码执行。但在ECMAScript中，0、+0或-0相除会返回NaN
 
 ```js
-/**
- * 深拷贝数组的方法
- * @param arr 被拷贝的数组
- * @param copyArr 拷贝后的数组
- */
-function copy (arr, copyArr) {
-    for (let num = 0; num < arr.length; num++) {
-        copyArr[num] = arr[num]
-    }
-}
+console.log("0", 0 / 0); // NaN
+console.log("0", -0 / +0); // NaN
+```
 
-var arrTest = [1, 2, 3, 4, 5];
-var arr2 = [];
+如果分子是非0值，分母是有符号0或无符号0，则会返回Infinity或-Infinity
 
-copy(arrTest, arr2);
+```js
+console.log("无穷大", 5 / 0); // Infinity
+console.log("无穷大", -5 / 0); // -Infinity
+```
 
-arr2[0] = 100;
-console.log(arr2[0]); // 100 
-console.log(arrTest[0]); // 1
+###### NaN几个独特的属性（isNaN）
+
+- 任何涉及NaN的操作始终返回NaN（如NaN/10），在连续多步计算时这可能是个问题
+- NaN不等于包括NaN在内的任何值
+
+```js
+console.log(NaN == NaN); // false
+console.log(isNaN(NaN)); // true
+console.log(isNaN(10)); // false
+console.log(isNaN("10")); // false 可以转化为数值10
+console.log(isNaN(true)); // false 可以转为数字1
+console.log(isNaN("11a")); // true
+console.log(isNaN("Hello")); // true
 ```
 
 
 
-#### js在控制台写入参数（题外话）
+##### 数值转换
+
+> 有3个函数可以将非数值转换为数值：Number()、parseInt()和parseFloat()。Number()是转型函数，可用于任何数据类型。后两个函数主要用于将字符串转换为数值。对于同样的参数，这3个函数执行的操作也不同
+
+###### *Number()*
+
+- 布尔值：true 转化为 1， false 转化为 0
+- 数值：直接返回
+- null：返回 0
+- undefined：返回 NaN
+- 字符串：使用如下规则
+  - 如果字符串包含数值字符，包括数值字符前面带加、减号的情况，则转换为一个十进制数值
+  -  如果字符串包含有效的浮点值格式如"1.1"，则会转换为相应的浮点值
+  - 如果字符串包含有效的十六进制格式如"0xf"，则会转换为与该十六进制值对应的十进制整数值
+  - 如果是空字符串（不包含字符），则返回0
+  -  如果字符串包含除上述情况之外的其他字符，则返回NaN
+- 对象：调用valueOf()方法，并按照上述规则转换返回的值。如果转换结果是NaN，则调用toString()方法，再按照转换字符串的规则转换
 
 ```js
-const readline = require("readline"); // 引入对应模块
-
-// 注入 readline 模块并引入 createInterface 方法
-var  rl = readline.createInterface({
-    input:process.stdin,
-    output:process.stdout
-});
-
-rl.question("请输入：", function (msg) {
-    console.log("输入的内容为: ", msg);
-    rl.close();
-})
-
-// close 事件监听
-rl.on("close", function () {
-    process.exit(0); // 结束程序
-})
+console.log("boolean", Number(true)); // 1
+console.log("boolean", Number(false)); // 0
+console.log("null", Number(null)); // 0
+console.log("undefined", Number(undefined)); // NaN
+console.log("string", Number("-11")); // -11
+console.log("string", Number(".8")); // 0.8
+console.log("string", Number("0xf")); // 15
+console.log("string", Number("11C")); // NaN
+console.log("string", Number("")); // 0
+console.log("string", Number("String")); // NaN
+let obj = {name: "Tome"} 
+console.log("obj", Number(obj)); // NaN
 ```
 
 
 
-### 查询数组
+###### *parseInt()*
 
-#### *indexOf()*
+> 考虑到用Number()函数转换字符串时相对复杂且有点反常规，通常在需要得到整数时可以优先使用parseInt()函数
 
-> 使用 *arr.indexOf(obj)*  返回数组所在索引；如果数组中包含多个相同的元素，indexOf()函数总是返回第一个与参数相同的元素的索引
+- parseInt()函数更专注于字符串是否包含数值模式
+- 字符串最前面的空格会被忽略，从第一个非空格字符开始转换
+- 如果第一个字符不是数值字符、加号或减号，parseInt()立即返回NaN
+- 假设字符串中的第一个字符是数值字符，parseInt()函数也能识别不同的整数格式（十进制、八进制、十六进制）
+  - 如果字符串以"0x"开头，就会被解释为十六进制整数
+  - 如果字符串以"0"开头，且紧跟着数值字符，在非严格模式下会被某些实现解释为八进制整数
+- 不同的数值格式很容易混淆，因此parseInt()也接收第二个参数，用于指定底数（进制数）[parseInt(number, 进制)]
 
 ```js
-const readline = require("readline");
+console.log("string", parseInt("1234CCC")); // 1234
+console.log("string", parseInt("CCC1234")); // NaN
+console.log("string", parseInt("70")); // 70
+console.log("string", parseInt("")); // NaN
+console.log("null", parseInt(null)); // NaN
+console.log("十六进制", parseInt("0xA")); // 10
+console.log("number", parseInt(22.5)); // 22
 
-var  rl = readline.createInterface({
-    input:process.stdin,
-    output:process.stdout
-});
-
-var names = ["Tony", "Jim", "张三", "李四", "Jack", "Jim", "张三"];
-
-rl.question("请输入需要查找的名字：", function (name) {
-    var position = names.indexOf(name);
-    if (position >= 0) {
-        console.log("查询到姓名[" + name + "]在数组的数组下标为[" + position + "]"); // 如果name为 张三 则返回 2
-    } else {
-        console.log("未查询到姓名：[" + name + "]");
-    }
-    rl.close();
-})
-
-rl.on("close", function () {
-    process.exit(0);
-})
+console.log("二进制", parseInt(10, 2)); // 2
+console.log("八进制", parseInt(10, 8)); // 8
+console.log("十进制", parseInt(10, 10)); // 10
+console.log("十六进制", parseInt(10, 16)); // 16
 ```
 
 
 
-#### *lastIndexOf()*
+###### *parseFloat()*
 
-> 该函数返回相同元素中最后一个元素的索引，如果没找到相同元素，则返回-1
-
-```js
-var names = ["Tony", "Jim", "张三", "李四", "Jack", "Jim", "张三"];
-...
-var position = names.lastIndexOf(name);
-if (position >= 0) {
-    console.log("查询到姓名[" + name + "]在数组的数组下标为[" + position + "]"); // 如果name为 张三 则返回 6
-} else {
-    console.log("未查询到姓名：[" + name + "]");
-}
-...
-```
-
-
-
-### 数组的字符串化
-
-> 数组转为字符串有两种方式：*jion()* 和 *toString()* ，两个方法都返回一个包含数组元素的字符串，各元素由逗号分开
+- parseFloat()函数的工作方式跟parseInt()函数类似，都是从位置0开始检测每个字符
+- 它也是解析到字符串末尾或者解析到一个无效的浮点数值字符为止。这意味着第一次出现的小数点是有效的，但第二次出现的小数点就无效了，此时字符串的剩余字符都会被忽略
+- parseFloat()函数的另一个不同之处在于，它始终忽略字符串开头的零
 
 ```js
-var arr = ["张三", "李四", "Jack", null, 1, 2, 3];
-
-var arrStr1 = arr.join();
-console.log(arrStr1); // 张三,李四,Jack,,1,2,3
-
-var arrStr2 = arr.toString();
-console.log(arrStr2); // 张三,李四,Jack,,1,2,3
+console.log("string", parseFloat("123CCC")); // 123
+console.log("string", parseFloat("CCC123")); // NaN
+console.log("string", parseFloat("0xA")); // 0
+console.log("string", parseFloat("22.5")); // 22.5
+console.log("number", parseFloat("22.6.7")); // 22.6
+console.log("number", parseFloat("0980.777")); // 980.777
+console.log("number", parseFloat("3.125e7")); // 31250000
 ```
-
-
-
-### 由已有的数组创建新数组
-
-> *concat()* 和 *splice()* 方法允许通过已有数组创建新数组
-
-#### *concat()*
-
-> concat方法可以合并多个数组创建一个新数组
-
-```js
-var arr1 = [1, 2, 3, 4, 5];
-var arr2 = [6, 7, 8, 9, 0];
-
-var myArr = arr1.concat(arr2);
-console.log(myArr); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-
-myArr = arr2.concat(arr1);
-console.log(myArr); // [6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
-```
-
-
-
-#### *splice()*
-
-> splice()方法从现有数组里截取一个新数组。该方法的第一个参数是截取的起始索引，第二个参数是截取的长度；splice()方法还有其他用法，比如为一个数组增加或移除元素，具体请参见MozillaDeveloper Network页面（http://mzl.la/1gmmlQ5）
-
-```js
-var arr3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-
-var testArr = arr3.splice(3, 2); // 该方法的第一个参数是截取的起始索引，第二个参数是截取的长度
-console.log(testArr); // [4, 5]
-console.log(arr3); // 截取后 原数组会剩下违背截取的元素 [1, 2, 3, 6, 7, 8, 9, 0]
-```
-
-
-
-### 可变函数
-
-> JavaScript拥有一组可变函数，使用它们，可以不必引用数组中的某个元素，就能改变数组内容
-
-#### 为数组添加元素
-
-> 有两个方法可以为数组添加元素：push()和unshift()
-
-##### *push()*
-
-> 此方法会将一个元素添加到数组末尾
-
-```js
-// push
-var numArr = [1, 2, 3, 4, 5];
-console.log(numArr.toString()); // 1,2,3,4,5
-numArr.push(6);
-console.log(numArr.toString()); // 1,2,3,4,5,6
-
-// push方法的实现：
-function pushDemo(arr, obj) {
-    arr[arr.length] = obj;
-}
-
-numArr = [1, 2, 3, 4, 5];
-pushDemo(numArr, 6);
-console.log(numArr.toString()); // 1,2,3,4,5,6
-```
-
-
-
-##### *unshift()*
-
-> 将元素添加至数组的开头
-
-```js
-// unshift
-numArr = [2, 3, 4, 5];
-numArr.unshift(1);
-console.log(numArr.toString());
-
-
-// unshift方法实现
-function unshiftDemo(arr, obj) {
-    var N = arr.length;
-    for (var i = N; i >= 0; i--) {
-        arr[i] = arr[i-1];
-    }
-    arr[0] = obj
-}
-numArr = [2, 3, 4, 5];
-unshiftDemo(numArr, 1);
-console.log(numArr.toString());
-```
-
-
-
-#### 从数组中删除元素
-
-##### *pop()*
-
-> 使用 pop() 方法可以从数组末尾删除元素
-
-```js
-var numArr = [1, 2, 3, 4, 5];
-numArr.pop();
-console.log(numArr.toString()); // 1,2,3,4
-```
-
-##### *shift()*
-
-> 删除数组的第一位元素，方法返回数组的第一个元素
-
-```js
-// 删除数组第一位元素的实现
-function shiftDemo(arr) {
-    for (var i = 0; i < arr.length; i++) {
-        arr[i] = arr[i + 1];
-    }
-    arr.pop();
-    return arr;
-}
-
-numArr = [1, 2, 3, 4, 5];
-console.log(shiftDemo(numArr).toString()); // 2,3,4,5
-
-numArr = [1, 2, 3, 4, 5];
-numArr.shift();
-console.log(numArr.toString()); // 2,3,4,5
-
-numArr = [6, 1, 2, 3, 4, 5];
-var first  = numArr.shift(); // 6
-numArr.push(first);
-console.log(numArr.toString()); // 1,2,3,4,5,6
-```
-
-
-
-#### 从数组的中间位置添加或删除元素(*splice()*)
-
-> 删除数组中的第一个元素和在数组开头添加一个元素存在同样的问题——两种操作都需要将数组中的剩余元素向前或向后移，然而splice()方法可以帮助我们执行其中任何一种操作
-
-所需参数
-
-- 起始索引
-- 需要删除元素的个数（添加时可以将其设为0）
-- 需要添加的元素
-
-##### 使用 *splice()* 为数组添加元素
-
-```js
-// splice
-var nums = [1, 2, 3, 7, 8];
-var addElement = [4, 5, 6];
-nums.splice(3, 0, addElement);
-console.log(nums.toString()); // 1,2,3,4,5,6,7,8
-console.log(nums.length); // 6 由于插入的元素为数组，因此形成了一个二维数组
-
-nums = [1, 2, 3, 7, 8];
-nums.splice(3, 0, 4, 5, 6)
-console.log(nums.toString()); // 1,2,3,4,5,6,7,8
-console.log(nums.length); // 8
-```
-
-
-
-##### 使用 *splice()* 为数组删除元素
-
-```js
-// 删除数组元素
-nums = [1, 2, 3, 7, 8, 4, 5];
-nums.splice(3, 2);
-console.log(nums.toString()); // 1,2,3,4,5
-```
-
-
-
-#### 为数组排序
-
-##### 反转数组元素 *reverse()*
-
-```js
-// 反转数组
-var numArr = [1, 2, 3, 4, 5];
-numArr.reverse();
-console.log(numArr.toString()); // 5,4,3,2,1
-```
-
-题外话：反转字符串
-
-```js
-var str = "Hello, World!"
-
-function reverseStr (str) {
-    var strArr = str.split("").reverse();
-    var reverse_str = "";
-    for (var i = 0; i < strArr.length; i++) {
-        reverse_str += strArr[i];
-    }
-    return reverse_str;
-}
-
-console.log(reverseStr(str));
-
-function reverseStrJoin (str) {
-    return str.split("").reverse().join("");
-}
-
-console.log(reverseStrJoin(str))
-```
-
-
-
-##### 对数组进行排序 *sort()*
-
-> 对数组进行排序是经常会遇到的需求，如果元素是字符串类型，那么数组的可变方法sort()就非常好使
->
-> 但是如果数组元素是数字类型，sort()方法的排序结果就不能让人满意了
-
-*sort()* 对字符串进行排序
-
-```js
-// 数组排序
-var srtArr = ["Zoom", "Davie", "Jim", "Jack", "Tim", "Willa"];
-console.log(srtArr.sort()); // [ 'Davie', 'Jack', 'Jim', 'Tim', 'Willa', 'Zoom' ]
-```
-
-
-
-借助其他方法为数字
-
-```js
-// 排序数字
-var nums = [1, 3, 2, 200, 6, 400, 4];
-console.log(nums.sort().toString()); // 1,2,200,3,4,400,6
-```
-
-> 为了让sort()方法也能排序数字类型的元素，可以在调用方法时传入一个大小比较函数，排序时，sort()方法将会根据该函数比较数组中两个元素的大小，从而决定整个数组的顺序
-
-```js
-/**
- * 该函数可以是一个简单的相减操作，从一个数字中减去另外一个数字。
- * 如果结果为负，那么被减数小于减数；
- * 如果结果为0，那么被减数与减数相等；
- * 如果结果为正，那么被减数大于减数
- *
- * @param num1
- * @param num2
- * @returns {number}
- */
-function compare (num1, num2) {
-    return num1 - num2;
-}
-
-nums = [1, 3, 2, 200, 6, 400, 4];
-console.log(nums.sort(compare).toString());
-```
-
-
-
-### 迭代器方法
-
-#### 不生成新数组的迭代方法
-
-##### *forEach()*
-
-> 该方法接受一个函数作为参数，对数组中的每个元素使用该函数
-
-```js
-function square(num) {
-    console.log(num, num * num);
-}
-
-var nums = [1, 2, 3, 4, 5];
-nums.forEach(square);
-```
-
-
-
-##### *every()*
-
-> 该方法接受一个返回值为布尔类型的函数，对数组中的每个元素使用该函数。如果**对于所有的元素，该函数均返回true，则该方法返回true**
-
-```js
-function isEven(num) {
-    return num % 2 === 0;
-}
-
-nums = [1, 2, 4, 6, 8, 10];
-var evenFlag = nums.every(isEven);
-if (evenFlag) {
-    console.log("数组内全为偶数")
-} else {
-    console.log("数组内不全为偶数")
-}
-```
-
-
-
-##### *some()*
-
-> 此方法也接受一个返回值为布尔类型的函数，**只要有一个元素使得该函数返回true，该方法就返回true**
-
-```js
-const nums = [1, 3, 5 , 7, 9];
-function someFunc (arr) {
-    let evenFlag = nums.some(isEven);
-    if (evenFlag) {
-        return "数组中有偶数元素";
-    } else {
-        return "数组中无偶数元素";
-    }
-}
-
-console.log(someFunc(nums));
-```
-
-
-
-##### *reduce()*
-
-> 此方法接受一个函数，返回一个值。该方法会从一个累加值开始，不断对累加值和数组中的后续元素调用该函数，直到数组中的最后一个元素，最后返回得到的累加值
-
-```js
-nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-function add(runningTotal, currentValue) {
-    return runningTotal + currentValue;
-}
-
-var sum = nums.reduce(add);
-console.log(sum) // 55
-```
-
-reduce()方法也可以用来将数组中的元素连接成一个长的字符串
-
-```js
-nums = ['Hello', 'World', "!"]
-function add(runningTotal, currentValue) {
-    return runningTotal + currentValue;
-}
-sum = nums.reduce(add);
-console.log(sum) // HelloWorld!
-```
-
-
-
-##### *reduceRight()*
-
-> JavaScript还提供了reduceRight()方法，和reduce()方法不同，它是从右到左执行
-
-```js
-function add(runningTotal, currentValue) {
-    return runningTotal + currentValue;
-}
-
-nums = ['Hello', 'World', "!"]
-sum = nums.reduceRight(add);
-console.log(sum) // !WorldHello
-```
-
-
-
-#### 生成新数组的迭代方法
-
-##### *map()*
-
-> map()和forEach()相像，对数组中的每个元素使用某个函数。两者的区别是map()返回一个新的数组，该数组的元素是对原有元素应用某个函数得到的结果
-
-```js
-{
-    function showItem(item) {
-        return item;
-    }
-
-    let nums = [1, 2, 3, 4, 5, 6];
-
-    const numsMap = nums.map(showItem);
-    console.log(numsMap); // [ 1, 2, 3, 4, 5, 6 ]
-}
-{
-    function showItem(item) {
-        return item[0];
-    }
-
-    let arr = ["jack", "fly", "tom"];
-    const arrMap = arr.map(showItem);
-    console.log(arrMap.join("")); // jft
-}
-```
-
-
-
-##### *filter()*
-
-> filter()和every()类似，传入一个返回值为布尔类型的函数。和every()方法不同的是，当对数组中的所有元素应用该函数，结果均为true时，该方法并不返回true，而是返回一个新数组，该数组包含应用该函数后结果为true的元素
-
-```js
-{
-    let nums = new Array();
-    for (let i = 0; i < 20; i++) {
-        nums[i] = i + 1;
-    }
-
-    function isEven(num) {
-        return num % 2 === 0;
-    }
-
-    function isObb(num) {
-        return num % 2 !== 0;
-    }
-
-    const filterEven = nums.filter(isEven);
-    console.log(filterEven); // 只输出偶数
-
-    const filterObb = nums.filter(isObb);
-    console.log(filterObb); // 只输出奇数
-}
-```
-
-使用此方法过滤字符串数组
-
-```js
-// 使用filter过滤字符串
-{
-    function afterc(item) {
-        if (item.indexOf("ac") > -1) {
-            return true;
-        }
-        return false;
-    }
-
-    let arr = ["jack", "tacl", "good", "hello", "heaccc"];
-
-    const strings = arr.filter(afterc);
-    console.log(strings); // [ 'jack', 'tacl', 'heaccc' ]
-}
-```
-
-
-
-### 二维数组和多维数组
-
-> JavaScript只支持一维数组，但是通过在数组里保存数组元素的方式，可以轻松创建多维数组
-
-
-
-#### 创建二维数组
-
-> 二维数组类似一种由行和列构成的数据表格。在JavaScript中创建二维数组，需要先创建一个数组，然后让数组的每个元素也是一个数组
-
-```js
-{
-    function createArr(numrows, numcols, initial) {
-        let arr = [];
-        for (let i = 0; i < numrows; i++) {
-            let columns = [];
-            for (let j = 0; j < numcols; j ++) {
-                columns[j] = initial;
-            }
-            arr[i] = columns;
-        }
-        return arr;
-    }
-
-    let arr = createArr(3, 4, 1);
-    console.log(arr); // [ [ 1, 1, 1, 1 ], [ 1, 1, 1, 1 ], [ 1, 1, 1, 1 ] ]
-    arr[2][3] = 'Test';
-    console.log(arr[2][3]); // Test
-}
-```
-
-
-
-#### 处理二维数组
-
-> 处理二维数组中的元素，有两种最基本的方式：按列访问和按行访问
-
-```js
-let grades = [[89, 77, 78], [76, 82, 81], [91, 94, 89]];
-
-let total = 0;
-let average = 0.0;
-
-for (let row  = 0; row < grades.length; row++) {
-    for (let col = 0; col < grades[row].length; col++) {
-        total += grades[row][col];
-    }
-    average = total / grades[row].length;
-    console.log("第" + (row + 1) + "行的平均值为：" + average);
-    total = 0;
-    average = 0.0;
-}
-```
-
-有时，会发生数组参差不齐的情况：
-
-```js
-// let grades = [[89, 77, 78], [76, 82, 81], [91, 94, 89]];
-
-let grades = [[1, 2, 3], [4, 5], [6, 7, 8, 9]];
-
-let total = 0;
-let average = 0.0;
-
-for (let row  = 0; row < grades.length; row++) {
-    for (let col = 0; col < grades[row].length; col++) {
-        total += grades[row][col];
-    }
-    average = total / grades[row].length;
-    console.log("第" + (row + 1) + "行的平均值为："
-                // 结果保留两位小数
-                + average.toFixed(2));
-    total = 0;
-    average = 0.0;
-}
-```
-
-
-
-### 对象数组
-
-> 数组可以包含对象，数组的方法和属性对对象依然适用
-
-```js
-function Point(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-/**
-     * 展示数组 x 与 y 的方法
-     * @param arr 被传入数组
-     */
-function displayPts(arr) {
-    for (let i = 0; i < arr.length; i++) {
-        console.log(arr[i].x + " " + arr[i].y);
-    }
-}
-
-let p1 = new Point(1, 2);
-let p2 = new Point(3, 4);
-let p3 = new Point(5, 6);
-let p4 = new Point(7, 8);
-
-let points = [p1, p2, p3, p4];
-
-console.log("==========处理前")
-displayPts(points);
-
-console.log("==========push处理后")
-let p5 = new Point(12, -1);
-points.push(p5);
-displayPts(points);
-
-console.log("==========shift处理后")
-points.shift();
-displayPts(points);
-```
-
-
-
-### 对象种的数组
-
-> 在对象中，可以使用数组存储复杂的数据
-
-```js
-function weekTemps() {
-    this.dataStore = [];
-    this.add = add;
-    this.average = average;
-}
-
-function add (temp) {
-    this.dataStore.push(temp);
-}
-
-function average () {
-    let total = 0;
-    for (let i = 0; i < this.dataStore.length; i++) {
-        total += this.dataStore[i];
-    }
-    return total / this.dataStore.length;
-}
-
-let wt = new weekTemps();
-wt.add(1);
-wt.add(3);
-wt.add(6);
-
-console.log(wt.average());
-```
-
-
-
-## 列表
-
-> 在日常生活中，人们经常使用列表：待办事项列表、购物清单、十佳榜单、最后十名榜单等。计算机程序也在使用列表，尤其是列表中保存的元素不是太多时。当不需要在一个很长的序列中查找元素，或者对其进行排序时，列表显得尤为有用。反之，如果数据结构非常复杂，列表的作用就没有那么大了
-
-### 列表的抽象数据类型定义
-
-| 方法/属性名        | 作用                               |
-| ------------------ | ---------------------------------- |
-| listSize（属性）   | 列表的元素个数                     |
-| pos（属性）        | 列表的当前位置                     |
-| length（属性）     | 返回列表中元素的个数               |
-| clear（方法）      | 清空列表中的所有元素               |
-| toString（方法）   | 返回列表的字符串形式               |
-| getElement（方法） | 返回当前位置的元素                 |
-| insert（方法）     | 在现有元素后插入新元素             |
-| append（方法）     | 在列表的末尾添加新元素             |
-| remove（方法）     | 从列表中删除元素                   |
-| front（方法）      | 将列表的当前位置移动到第一个元素   |
-| end（方法）        | 将列表的当前位置移动到最后一个元素 |
-| prev（方法）       | 将当前位置后移一位                 |
-| next（方法）       | 将当前位置前移一位                 |
-| hasNext（方法）    | 判断后一位                         |
-| hasPrev（方法）    | 判断前一位                         |
-| currPos（方法）    | 返回列表的当前位置                 |
-| moveTo（方法）     | 将当前位置移动到指定位置           |
-
-### 实现列表类
-
-> 根据上面定义的列表抽象数据类型，可以直接实现一个List类
 
