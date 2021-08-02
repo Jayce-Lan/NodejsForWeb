@@ -294,3 +294,168 @@ console.log("number", parseFloat("0980.777")); // 980.777
 console.log("number", parseFloat("3.125e7")); // 31250000
 ```
 
+
+
+#### *String* 类型
+
+> String（字符串）数据类型表示零或多个16位Unicode字符序列。字符串可以使用双引号（"）、单引号（'）或反引号（`）标示
+
+##### 字符字面变量
+
+| 字面量 | 含义                                                         |
+| ------ | ------------------------------------------------------------ |
+| \n     | 换行                                                         |
+| \t     | 制表                                                         |
+| \b     | 退格                                                         |
+| \r     | 回车                                                         |
+| \f     | 换页                                                         |
+| \\\    | 反斜杠（\）                                                  |
+| \\'    | 单引号（'）                                                  |
+| \\"    | 双引号（"）                                                  |
+| \\`    | 反引号（`）                                                  |
+| \xnn   | 以十六进制编码 nn 表示的字符，例如\x41等于“A”                |
+| \unnnn | 以十六进制编码 nnnn 表示的 Unicode 字符，例如\u03a3等于希腊字符 ∑ |
+
+```js
+let str = "This is \u03a3"; // \u03a3 只表示单个字符
+console.log(str);
+console.log(str.length); // 9
+
+str = "我将打出一个双引号：\"\"";
+console.log(str);
+```
+
+
+
+##### 字符串的特点
+
+> ECMAScript中的字符串是不可变的（immutable），意思是一旦创建，它们的值就不能变了。要修改某个变量中的字符串值，必须先销毁原始的字符串，然后将包含新值的另一个字符串保存到该变量
+
+- 变量lang一开始包含字符串"Java"
+- 紧接着，lang被重新定义为包含"Java"和"Script"的组合，也就是"JavaScript"
+- 整个过程首先会分配一个足够容纳10个字符的空间，然后填充上"Java"和"Script"
+- 最后销毁原始的字符串"Java"和字符串"Script"，因为这两个字符串都没有用了
+- 所有处理都是在后台发生的，而这也是一些早期的浏览器（如Firefox 1.0之前的版本和IE6.0）在拼接字符串时非常慢的原因。这些浏览器在后来的版本中都有针对性地解决了这个问题
+
+```js
+let lang = "Java";
+console.log("lang: ", lang);
+lang = lang + "Script";
+console.log("lang: ", lang);
+```
+
+
+
+##### 转换为字符串
+
+###### *toString()* 
+
+> 使用几乎所有值都有的toString()方法。这个方法唯一的用途就是返回当前值的字符串等价物
+
+- toString()方法可见于数值、布尔值、对象和字符串值（字符串值也有toString()方法，该方法只是简单地返回自身的一个副本）
+- null和undefined值没有toString()方法
+- toString()的参数
+  - 多数情况下，toString()不接收任何参数
+  - 在对数值调用这个方法时，toString()可以接收一个底数参数，即以什么底数来输出数值的字符串表示
+  - 默认情况下，toString()返回数值的十进制字符串表示
+  - 通过传入参数，可以得到数值的二进制、八进制、十六进制，或者其他任何有效基数的字符串表示
+
+```js
+let value = true;
+console.log("boolean", value.toString()); // true
+// value = undefined;
+// console.log("undefined", value.toString()); // TypeError: Cannot read property 'toString' of undefined
+// value = null;
+// console.log("null", value.toString()); // TypeError: Cannot read property 'toString' of null
+value = 3.141592653;
+console.log("number", value.toString()); // 3.141592653
+
+let num = 10;
+console.log("二进制", num.toString(2)); // 1010
+console.log("八进制", num.toString(8)); // 12
+console.log("十进制", num.toString(10)); // 10
+console.log("十六进制", num.toString(16)); // a
+```
+
+
+
+###### *String()*
+
+> 如果你不确定一个值是不是null或undefined，可以使用String()转型函数，它始终会返回表示相应类型值的字符串
+
+- 如果值有toString()方法，则调用该方法（不传参数）并返回结果
+- 如果值是null，返回"null"
+- 如果值是undefined，返回"undefined"
+
+```js
+console.log("null", String(null)); // null
+console.log("undefined", String(undefined)); // undefined
+console.log("boolean", String(true)); // true
+console.log("number", String(.5)); // 0.5
+```
+
+
+
+###### 用加号操作符给一个值加上一个空字符串
+
+> 用加号操作符给一个值加上一个空字符串""也可以将其转换为字符串
+
+
+
+##### 模板字面量
+
+- ECMAScript 6新增了使用模板字面量定义字符串的能力
+- 与使用单引号或双引号不同，模板字面量保留换行字符，可以跨行定义字符串
+- 由于模板字面量会保持反引号内部的空格，因此在使用时要格外注意。格式正确的模板字符串看起来可能会缩进不当
+
+```js
+let multiLineString = "首行\n第二行";
+console.log(multiLineString);
+
+let multiLineTemplateLiteral = `首行
+第二行`;
+console.log(multiLineTemplateLiteral);
+```
+
+
+
+##### 字符串插值
+
+> 模板字面量最常用的一个特性是支持字符串插值，也就是可以在一个连续定义中插入一个或多个值
+
+```js
+let num = 5;
+let str = "×";
+console.log("普通拼接：", num + str + num + " = " + (num * num));
+console.log("字符串插值：", `${num + str + num} = ${num * num}`);
+```
+
+- 所有插入的值都会使用toString()强制转型为字符串，而且任何JavaScript表达式都可以用于插值
+- 将表达式转换为字符串时会调用toString()
+- 在插值表达式中可以调用函数和方法
+- 模板也可以插入自己之前的值
+
+```js
+// 将表达式转换为字符串时会调用toString()
+let foo = {toString: ()=> "World!"};
+console.log(`Hello, ${foo}`); // Hello, World!
+
+// 调用函数和方法
+function capitalize(word) {
+    return `${word[0].toUpperCase() + word.slice(1)}`;
+}
+
+console.log("capitalize", `${capitalize("hello")}, ${capitalize("world")} !`); // Hello, World !
+
+// 插入自己之前的值
+let value = "";
+function append() {
+    value = `${value}abc`;
+    console.log(value);
+}
+
+append(); // abc
+append(); // abcabc
+append(); // abcabcabc
+```
+
