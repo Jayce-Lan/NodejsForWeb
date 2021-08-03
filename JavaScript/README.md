@@ -750,3 +750,147 @@ let obj2 = new Object; // 合法但是不推荐
 
 因为在ECMAScript中**Object是所有对象的基类，所以任何对象都有这些属性和方法**
 
+
+
+### 操作符
+
+#### 指数操作符（**）
+
+> ECMAScript 7新增了指数操作符，Math.pow()现在有了自己的操作符＊＊，结果是一样的
+
+```js
+let num = Math.pow(3, 2);
+console.log(num); // 9
+num = 3 ** 2;
+console.log(num); // 9
+num = 16 ** .5;
+console.log(num); // 4
+```
+
+不仅如此，指数操作符也有自己的指数赋值操作符＊＊=，该操作符执行指数运算和结果的赋值操作
+
+```js
+let num = 16;
+num **= .5;
+console.log(num); // 4
+```
+
+
+
+#### 加性操作符
+
+> 加性操作符，即加法和减法操作符，一般都是编程语言中最简单的操作符。不过，在ECMAScript中，这两个操作符拥有一些特殊的行为
+
+##### 加法操作符
+
+- 如果有任一操作数是NaN，则返回NaN（常用于字符串拼接）
+- 如果是Infinity加Infinity，则返回Infinity
+- 如果是-Infinity加-Infinity，则返回-Infinity
+- 如果是Infinity加-Infinity，则返回NaN
+- 如果是+0加+0，则返回+0
+- 如果是-0加+0，则返回+0
+- 如果是-0加-0，则返回-0
+- 如果有一个操作数是字符串，则要应用如下规则
+  - 如果两个操作数都是字符串，则将第二个字符串拼接到第一个字符串后面
+  - 如果只有一个操作数是字符串，则将另一个操作数转换为字符串，再将两个字符串拼接在一起
+- 对于undefined和null，则调用String()函数，分别获取"undefined"和"null"
+
+```js
+console.log("null", 5 + null); // 5 null 会被转为0
+console.log("undefined", 5 + undefined); // NaN
+console.log("true", 5 + true); // 6
+console.log("false", 5 + false); // 5
+console.log("string", 5 + "5"); // "55"
+```
+
+
+
+##### 减法操作符
+
+- 如果两个操作数都是数值，则执行数学减法运算并返回结果
+- 如果有任一操作数是NaN，则返回NaN
+- 如果是Infinity减Infinity，则返回NaN
+- 如果是-Infinity减-Infinity，则返回NaN
+- 如果是Infinity减-Infinity，则返回Infinity
+- 如果是-Infinity减Infinity，则返回-Infinity
+- 如果是+0减+0，则返回+0
+- 如果是+0减-0，则返回-0
+- 如果是-0减-0，则返回+0
+- 如果有任一操作数是字符串、布尔值、null或undefined，则先在后台使用Number()将其转换为数值，然后再根据前面的规则执行数学运算。如果转换结果是NaN，则减法计算的结果是NaN
+- 如果有任一操作数是对象，则调用其valueOf()方法取得表示它的数值
+  - 如果该值是NaN，则减法计算的结果是NaN
+  - 如果对象没有valueOf()方法，则调用其toString()方法，然后再将得到的字符串转换为数值
+
+#### 关系操作符
+
+> 在大多数比较的场景中，如果一个值不小于另一个值，那就一定大于或等于它。但在比较NaN时，无论是小于还是大于等于，比较的结果都会返回false
+
+```js
+console.log("a" > 3); // false
+console.log("a" < 3); // false
+console.log(NaN > 3); // false
+console.log(NaN < 3); // false
+```
+
+
+
+#### 相等操作符
+
+> 判断两个变量是否相等是编程中最重要的操作之一。在比较字符串、数值和布尔值是否相等时，过程都很直观。但是在比较两个对象是否相等时，情形就比较复杂了。ECMAScript中的相等和不相等操作符，原本在比较之前会执行类型转换，但很快就有人质疑这种转换是否应该发生。最终，ECMAScript提供了两组操作符。第一组是等于和不等于，它们在比较之前执行转换。第二组是全等和不全等，它们在比较之前不执行转换
+
+##### 等于和不等于（== 和 !=）
+
+- 如果任一操作数是布尔值，则将其转换为数值再比较是否相等。false转换为0, true转换为1
+- 如果一个操作数是字符串，另一个操作数是数值，则尝试将字符串转换为数值，再比较是否相等
+- 如果一个操作数是对象，另一个操作数不是，则调用对象的valueOf()方法取得其原始值，再根据前面的规则进行比较
+- null和undefined相等
+- null和undefined不能转换为其他类型的值再进行比较
+- 如果有任一操作数是NaN，则相等操作符返回false，不相等操作符返回true。即使两个操作数都是NaN，相等操作符也返回false，因为按照规则，NaN不等于NaN
+- 如果两个操作数都是对象，则比较它们是不是同一个对象。如果两个操作数都指向同一个对象，则相等操作符返回true。否则，两者不相等
+
+```js
+let obj = {
+    valueOf() {
+        return 0;
+    }
+}
+
+let object = {
+    name: "Jayce",
+    job: "coder"
+}
+
+let obj1 = object,
+    obj2 = object;
+
+console.log(null == undefined); // true
+console.log(obj == 0); // true
+console.log(NaN == NaN); // false
+console.log(obj1 == obj2); // true
+console.log(55 == "55"); // true
+```
+
+
+
+##### 全等和不全等（=== 和 !==）
+
+> 全等和不全等操作符与相等和不相等操作符类似，只不过它们在比较相等时不转换操作数
+
+```js
+console.log(null === undefined); // false
+console.log(55 === "55"); // false
+```
+
+
+
+#### 逗号操作符
+
+> 在一条语句中同时声明多个变量是逗号操作符最常用的场景。不过，也可以使用逗号操作符来辅助赋值。在赋值时使用逗号操作符分隔值，最终会返回表达式中最后一个值
+
+```js
+let num = (1, 2, 3, 4, 5, 6);
+console.log(num); // 6
+```
+
+num将被赋值为6，因为6是表达式中最后一项。逗号操作符的这种使用场景并不多见，但这种行为的确存在
+
