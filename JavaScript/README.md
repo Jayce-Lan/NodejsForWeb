@@ -727,3 +727,26 @@ console.log(Baz [Symbol.hasInstance](baz)); // false
 console.log(Bar [Symbol.hasInstance](baz)); // true
 ```
 
+
+
+#### Object类型
+
+> ECMAScript中的对象其实就是一组数据和功能的集合。对象通过new操作符后跟对象类型的名称来创建。开发者可以通过创建Object类型的实例来创建自己的对象，然后再给对象添加属性和方法
+
+```js
+let obj1 = new Object();
+let obj2 = new Object; // 合法但是不推荐
+```
+
+##### Object的属性和方法
+
+- *constructor*：用于创建当前对象的函数
+- *hasOwnProperty(propertyName)*： 于判断当前对象实例（不是原型）上是否存在给定的属性；要检查的属性名必须是字符串（如o.hasOwnProperty("name")）或符号
+- *isPrototypeOf(object)*：用于判断当前对象是否为另一个对象的原型
+- *propertyIsEnumerable(propertyName)*：用于判断给定的属性是否可以使用for-in语句枚举；与hasOwnProperty()一样，属性名必须是字符串
+- *toLocaleString()*：返回对象的字符串表示，该字符串反映对象所在的本地化执行环境
+- *toString()*：返回对象的字符串表示
+- *valueOf()*：返回对象对应的字符串、数值或布尔值表示。通常与toString()的返回值相同
+
+因为在ECMAScript中**Object是所有对象的基类，所以任何对象都有这些属性和方法**
+
