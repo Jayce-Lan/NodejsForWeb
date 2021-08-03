@@ -79,3 +79,66 @@
     append(); // abcabc
     append(); // abcabcabc
 }
+
+{
+    console.log("==============================标签函数================================");
+    function simpleTag(string, num1, num2, sum) {
+        console.log("string", string); //  [ '', ' + ', ' = ', '' ]
+        console.log("num1", num1); // 5
+        console.log("num2", num2); // 6
+        console.log("sum", sum); // 11
+        return "foobar";
+    }
+
+    let a = 5, b = 6;
+    let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+    console.log(targetValue);
+}
+
+{
+    console.log("==============================标签函数================================");
+    function simpleTag(string, ...nums) {
+        console.log("string", string);
+        for (const num of nums) {
+            console.log("nums", num);
+        }
+        return "foobar";
+    }
+
+    let a = 5, b = 6;
+    let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+    console.log(targetValue);
+}
+
+{
+    console.log("==============================标签函数================================");
+    function simpleTag(string, ...nums) {
+        return string[0] + nums.map((item, index) => `${item} ${string[index + 1]}`).join("");
+    }
+    let a = 5, b = 6;
+    let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+    console.log(targetValue); // 5  + 6  = 11
+}
+
+{
+    console.log("=============================原始字符串===============================");
+    console.log(`\u00A9`); // ©
+    console.log(String.raw`\u00A9`); // \u00A9
+
+    console.log(`第一行\n第二行`);
+    console.log(String.raw`第一行\n第二行`);
+    
+    function printRaw(strings) {
+        console.log("未处理：")
+        for (const string of strings) {
+            console.log(string);
+        }
+
+        console.log("处理后");
+        for (const rawString of strings.raw) {
+            console.log(rawString);
+        }
+    }
+
+    printRaw`\n${"and"}\u00A9`;
+}

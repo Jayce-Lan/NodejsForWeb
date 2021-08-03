@@ -459,3 +459,190 @@ append(); // abcabc
 append(); // abcabcabc
 ```
 
+
+
+##### 模板字面量标签函数
+
+> 模板字面量也支持定义标签函数（tag function），而通过标签函数可以自定义插值行为。标签函数会接收被插值记号分隔后的模板和对每个表达式求值的结果
+
+```js
+function simpleTag(string, num1, num2, sum) {
+    console.log("string", string); //  [ '', ' + ', ' = ', '' ]
+    console.log("num1", num1); // 5
+    console.log("num2", num2); // 6
+    console.log("sum", sum); // 11
+    return "foobar";
+}
+
+let a = 5, b = 6;
+let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+console.log(targetValue);
+```
+
+因为表达式参数的数量是可变的，所以通常应该使用剩余操作符（rest operator）将它们收集到一个数组中
+
+```js
+function simpleTag(string, ...nums) {
+    console.log("string", string);
+    for (const num of nums) {
+        console.log("nums", num);
+    }
+    return "foobar";
+}
+
+let a = 5, b = 6;
+let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+console.log(targetValue);
+```
+
+对于有n个插值的模板字面量，传给标签函数的表达式参数的个数始终是n，而传给标签函数的第一个参数所包含的字符串个数则始终是n+1。因此，如果你想把这些字符串和对表达式求值的结果拼接起来作为默认返回的字符串，可以这样做
+
+```js
+function simpleTag(string, ...nums) {
+    return string[0] + nums.map((item, index) => `${item} ${string[index + 1]}`).join("");
+}
+let a = 5, b = 6;
+let targetValue = simpleTag`${a} + ${b} = ${a + b}`;
+console.log(targetValue); // 5  + 6  = 11
+```
+
+
+
+##### 原始字符串（String.raw）
+
+> 使用模板字面量也可以直接获取原始的模板字面量内容（如换行符或Unicode字符），而不是被转换后的字符表示
+
+- 可以使用默认的*String.raw*标签函数
+- 也可以通过标签函数的第一个参数，即字符串数组的*.raw*属性取得每个字符串的原始内容
+
+###### *String.raw()*
+
+```js
+console.log(`\u00A9`); // ©
+console.log(String.raw`\u00A9`); // \u00A9
+
+console.log(`第一行\n第二行`);
+console.log(String.raw`第一行\n第二行`);
+```
+
+###### *.raw*
+
+```js
+function printRaw(strings) {
+    console.log("未处理：")
+    for (const string of strings) {
+        console.log(string);
+    }
+
+    console.log("处理后");
+    for (const rawString of strings.raw) {
+        console.log(rawString);
+    }
+}
+
+printRaw`\n${"and"}\u00A9`;
+```
+
+
+
+#### Symbol类型
+
+> Symbol（符号）是ECMAScript 6新增的数据类型。符号是原始值，且符号实例是唯一、不可变的。符号的用途是确保对象属性使用唯一标识符，不会发生属性冲突的危险
+
+##### 符号的基本用法
+
+符号需要使用Symbol()函数初始化。因为符号本身是原始类型，所以typeof操作符对符号返回symbol
+
+```js
+let mySymbol = Symbol();
+console.log(typeof mySymbol); // symbol
+```
+
+
+
+- 调用Symbol()函数时，也可以传入一个字符串参数作为对符号的描述（description），将来可以通过这个字符串来调试代码。但是，这个字符串参数与符号定义或标识完全无关
+- 符号没有字面量语法，这也是它们发挥作用的关键。按照规范，你只要创建Symbol()实例并将其用作对象的新属性，就可以保证它不会覆盖已有的对象属性，无论是符号属性还是字符串属性
+- 最重要的是，Symbol()函数不能与new关键字一起作为构造函数使用。这样做是为了避免创建符号包装对象，像使用Boolean、String或Number那样，它们都支持构造函数且可用于初始化包含原始值的包装对象
+- 如果确实想使用符号包装对象，可以借用Object()函数
+
+```js
+let symbol1 = Symbol();
+let symbol2 = Symbol();
+let fooSymbol1 = Symbol("foo");
+let fooSymbol2 = Symbol("foo");
+console.log(symbol1 == symbol2); // false
+console.log(fooSymbol1 == fooSymbol2); // false
+console.log(symbol1); // Symbol()
+console.log(fooSymbol1); // Symbol(foo)
+
+// let mySymbol = new Symbol(); // TypeError: Symbol is not a constructor
+let mySymbol = Symbol();
+let myWrappedSymbol = new Object(mySymbol);
+console.log(myWrappedSymbol); // [Symbol: Symbol()]
+console.log(typeof myWrappedSymbol); // object
+```
+
+
+
+##### 使用全局符号注册表（Symbol.for()）
+
+- 如果运行时的不同部分需要共享和重用符号实例，那么可以用一个字符串作为键，在全局符号注册表中创建并重用符号
+- Symbol.for()对每个字符串键都执行幂等操作
+- 第一次使用某个字符串调用时，它会检查全局运行时注册表，发现不存在对应的符号，于是就会生成一个新符号实例并添加到注册表中
+- 后续使用相同字符串的调用同样会检查注册表，发现存在与该字符串对应的符号，然后就会返回该符号实例
+- 即使采用相同的符号描述，在全局注册表中定义的符号跟使用Symbol()定义的符号也并不等同
+- 全局注册表中的符号必须使用字符串键来创建，因此作为参数传给Symbol.for()的任何值都会被转换为字符串。此外，注册表中使用的键同时也会被用作符号描述
+- 还可以使用Symbol.keyFor()来查询全局注册表，这个方法接收符号，返回该全局符号对应的字符串键
+  - 如果查询的不是全局符号，则返回undefined
+  - 如果传给Symbol.keyFor()的不是符号，则该方法抛出TypeError
+
+```js
+let fooSymbol = Symbol.for("foo"); // 创建新符号
+let otherFooSymbol = Symbol.for("foo"); // 重用已有符号
+let newFooSymbol = Symbol("foo");
+console.log(fooSymbol); // Symbol(foo)
+console.log(typeof  otherFooSymbol); // symbol
+console.log(fooSymbol === otherFooSymbol); // true
+console.log(newFooSymbol === otherFooSymbol); // false
+
+let unSymbol = Symbol.for();
+console.log(unSymbol); // Symbol(undefined)
+
+console.log(Symbol.keyFor(fooSymbol)); // foo
+console.log(Symbol.keyFor(123)); // TypeError: 123 is not a symbol
+```
+
+
+
+##### 使用符号作为属性
+
+> 凡是可以使用字符串或数值作为属性的地方，都可以使用符号。这就包括了对象字面量属性和Object.defineProperty()/Object.defineProperties()定义的属性。对象字面量只能在计算属性语法中使用符号作为属性
+
+- 类似于Object.getOwnPropertyNames()返回对象实例的常规属性数组
+- Object.getOwnProperty-Symbols()返回对象实例的符号属性数组
+- 这两个方法的返回值彼此互斥
+- Object.getOwnProperty-Descriptors()会返回同时包含常规和符号属性描述符的对象
+- Reflect.ownKeys()会返回两种类型的键
+
+```js
+let s1 = Symbol("foo"),
+    s2 = Symbol("bar"),
+    s3 = Symbol("baz"),
+    s4 = Symbol("qux");
+
+let obj = {
+    s1: "foo value"
+}
+// 类似于 obj.s1 = "foo value";
+console.log(obj); // { Symbol(foo): 'foo value' }
+Object.defineProperty(obj, s2, {
+    value: "bar value"
+});
+
+console.log(obj);
+
+console.log(Reflect.ownKeys(obj)); // [ 's1', Symbol(bar) ] 由于写入方式不同，因此返回的键不同
+console.log(Object.getOwnPropertyNames(obj)); // [ 's1' ] 返回对象实例的常规属性数组
+console.log(Object.getOwnPropertySymbols(obj)); // Symbol(bar) 返回对象实例的符号属性数组
+```
+
