@@ -56,5 +56,52 @@
     console.log(Reflect.ownKeys(obj)); // [ 's1', Symbol(bar) ] 由于写入方式不同，因此返回的键不同
     console.log(Object.getOwnPropertyNames(obj)); // [ 's1' ] 返回对象实例的常规属性数组
     console.log(Object.getOwnPropertySymbols(obj)); // Symbol(bar) 返回对象实例的符号属性数组
+}
 
+{
+    class Emitter {
+        constructor(max) {
+            this.max = max
+            this.asyncIdx = 0;
+        }
+
+        async * [Symbol.asyncIterator] () {
+            while (this.asyncIdx < this.max) {
+                yield new Promise(resolve => resolve(this.asyncIdx++)); // yield 关键字用来暂停和恢复一个生成器函数
+            }
+        }
+    }
+
+    async function asyncCount() {
+        let emitter = new Emitter(5);
+        for await (const x of emitter) {
+            console.log(x);
+        }
+    }
+
+    // asyncCount();
+}
+
+{
+    console.log("=================Symbol.hasInstance================")
+    function Foo() {}
+    let a = new Foo();
+    console.log(a instanceof Foo); // true
+    console.log(Foo [Symbol.hasInstance](a)); // true
+
+    class Bar {}
+    let b = new Bar();
+    console.log(b instanceof Bar); // true
+    console.log(Bar [Symbol.hasInstance](b)); // true
+
+    class Baz extends Bar{
+        static [Symbol.hasInstance]() {
+            return false;
+        }
+    }
+
+    let baz = new Baz();
+
+    console.log(Baz [Symbol.hasInstance](baz)); // false
+    console.log(Bar [Symbol.hasInstance](baz)); // true
 }

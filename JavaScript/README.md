@@ -646,3 +646,84 @@ console.log(Object.getOwnPropertyNames(obj)); // [ 's1' ] 返回对象实例的�
 console.log(Object.getOwnPropertySymbols(obj)); // Symbol(bar) 返回对象实例的符号属性数组
 ```
 
+
+
+##### *Symbol.asyncIterator*
+
+> 根据ECMAScript规范，这个符号作为一个属性表示“一个方法，该方法返回对象默认的AsyncIterator。由for-await-of语句使用”。换句话说，这个符号表示实现异步迭代器API的函数
+
+- for-await-of循环会利用这个函数执行异步迭代操作
+- 循环时，它们会调用以Symbol.asyncIterator为键的函数，并期望这个函数会返回一个实现迭代器API的对象
+- 很多时候，返回的对象是实现该API的AsyncGenerator
+
+```js
+class Emitter {
+    constructor(max) {
+        this.max = max
+        this.asyncIdx = 0;
+    }
+
+    async * [Symbol.asyncIterator] () {
+        while (this.asyncIdx < this.max) {
+            yield new Promise(resolve => resolve(this.asyncIdx++)); // yield 关键字用来暂停和恢复一个生成器函数
+        }
+    }
+}
+
+async function asyncCount() {
+    let emitter = new Emitter(5);
+    for await (const x of emitter) {
+        console.log(x);
+    }
+}
+
+asyncCount();
+```
+
+
+
+##### *Symbol.hasInstance*
+
+> 根据ECMAScript规范，这个符号作为一个属性表示“一个方法，该方法决定一个构造器对象是否认可一个对象是它的实例
+
+由instanceof操作符使用”，instanceof操作符可以用来确定一个对象实例的原型链上是否有原型
+
+```js
+function Foo() {}
+let a = new Foo();
+console.log(a instanceof Foo); // true
+
+class Bar {}
+let b = new Bar();
+console.log(b instanceof Bar); // true
+```
+
+在ES6中，instanceof操作符会使用Symbol.hasInstance函数来确定关系。以Symbol. hasInstance为键的函数会执行同样的操作，只是操作数对调了一下
+
+```js
+function Foo() {}
+let a = new Foo();
+console.log(Foo [Symbol.hasInstance](a)); // true
+
+class Bar {}
+let b = new Bar();
+console.log(Bar [Symbol.hasInstance](b)); // true
+```
+
+这个属性定义在Function的原型上，因此默认在所有函数和类上都可以调用。由于instanceof操作符会在原型链上寻找这个属性定义，就跟在原型链上寻找其他属性一样，因此可以在继承的类上通过静态方法重新定义这个函数
+
+```js
+class Bar {}
+
+class Baz extends Bar{
+    static [Symbol.hasInstance]() {
+        return false;
+    }
+}
+
+let baz = new Baz();
+
+console.log(Baz [Symbol.hasInstance](baz)); // false
+console.log(Bar [Symbol.hasInstance](baz)); // true
+```
+
