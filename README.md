@@ -11,5 +11,5 @@
 - [*CSS* 学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/CSS)
 
 - [*TypeScript* 学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/TypeScript)
-- [*Vue.js* 学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/vue2.x)
+- [*Vue.js 2.x* 版本学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/vue2.x)
 
