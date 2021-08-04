@@ -1181,3 +1181,41 @@ console.log("num2", num2); // 6
 
 #### 传递参数
 
+> ECMAScript中所有函数的参数都是按值传递的。这意味着函数外的值会被复制到函数内部的参数中，就像从一个变量复制到另一个变量一样。如果是原始值，那么就跟原始值变量的复制一样，如果是引用值，那么就跟引用值变量的复制一样
+
+```js
+function addNum(num) {
+    num += 10;
+    return num;
+}
+
+let num = 20;
+let addNumValue = addNum(num);
+console.log("num", num); // 20
+console.log("addNumValue", addNumValue); // 30
+
+function setName(obj, str) {
+    obj.name = str
+}
+
+let obj = new Object();
+console.log("obj", obj); // {}
+setName(obj, "Jayce");
+console.log("obj", obj); // { name: 'Jayce' }
+```
+
+将obj重新定义为一个有着不同name的新对象。当obj传入setName()时，其name属性被设置为"Jayce"。然后变量obj被设置为一个新对象且name属性被设置为"Tome"。如果obj是按引用传递的，那么obj应该自动将指针改为指向name为"Tome"的对象。可是，当我们再次访问obj.name时，它的值是"Jayce"，这表明函数中参数的值改变之后，原始的引用仍然没变。当obj在函数内部被重写时，它变成了一个指向本地对象的指针。而那个本地对象在函数执行结束时就被销毁了
+
+```js
+function setName(obj) {
+    obj.name = "Jayce";
+    obj = new Object();
+    obj = "Tome";
+}
+
+let obj = new Object();
+console.log("obj", obj); // {}
+setName(obj);
+console.log("obj", obj); // { name: 'Jayce' }
+```
+
