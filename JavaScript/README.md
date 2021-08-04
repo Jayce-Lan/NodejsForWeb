@@ -894,3 +894,169 @@ console.log(num); // 6
 
 num将被赋值为6，因为6是表达式中最后一项。逗号操作符的这种使用场景并不多见，但这种行为的确存在
 
+
+
+### 语句
+
+> ECMA-262描述了一些语句（也称为流控制语句），而ECMAScript中的大部分语法都体现在语句中。语句通常使用一或多个关键字完成既定的任务。语句可以简单，也可以复杂。简单的如告诉函数退出，复杂的如列出一堆要重复执行的指令
+
+#### *for-in* 语句
+
+> for-in语句是一种严格的迭代语句，用于枚举对象中的非符号键属性
+
+```js
+for (const propName in window) {
+    console.log(propName);
+}
+```
+
+这个例子使用for-in循环显示了BOM对象window的所有属性。每次执行循环，都会给变量propName赋予一个window对象的属性作为值，直到window的所有属性都被枚举一遍。与for循环一样，这里控制语句中的const也不是必需的。但为了确保这个局部变量不被修改，推荐使用const
+
+- ECMAScript中对象的属性是无序的，因此for-in语句不能保证返回对象属性的顺序。换句话说，所有可枚举的属性都会返回一次，但返回的顺序可能会因浏览器而异
+- 如果for-in循环要迭代的变量是null或undefined，则不执行循环体
+
+
+
+#### *for-of* 语句
+
+> for-of语句是一种严格的迭代语句，用于遍历可迭代对象的元素
+
+for-of循环会按照可迭代对象的next()方法产生值的顺序迭代元素
+
+```js
+let obj = {
+    name: "Tom",
+    age: 25,
+    job: "coder",
+    sex: "man"
+}
+
+let arr = [1, 2, 3, 4, 5, 6];
+
+// for in 遍历对象的键
+for (const key in obj) {
+    console.log("for-in:", key);
+}
+
+for (const num in arr) {
+    console.log("for-in: ", num); // 打印数组下标
+}
+
+// for of 遍历数组的元素
+for (const item of arr) {
+    console.log("for-of: ", item);
+}
+```
+
+
+
+##### 关于对象的遍历
+
+```js
+let obj2 = [
+        {
+            name: "Tom",
+            age: 25,
+            job: "coder",
+            sex: "man"
+        },
+        {
+            name: "Tom",
+            age: 24,
+            job: "coder",
+            sex: "man"
+        },
+        {
+            name: "Tom",
+            age: 23,
+            job: "coder",
+            sex: "man"
+        },
+        {
+            name: "Tom",
+            age: 22,
+            job: "coder",
+            sex: "man"
+        }
+    ]
+for (const o of obj2) {
+    console.log(typeof o);
+    console.log(o);
+}
+
+// 遍历对象
+for (const o of obj2) {
+    for (const propName in o) {
+        console.log(propName + ":" + o[propName]);
+    }
+}
+```
+
+
+
+#### 标签语句
+
+在这个例子中，start是一个标签，可以在后面通过break或continue语句引用。标签语句的典型应用场景是嵌套循环
+
+```js
+start: for (let i = 0; i < 10; i++) {
+    console.log(i);
+}
+```
+
+
+
+#### break和continue语句
+
+> break和continue语句为执行循环代码提供了更严格的控制手段
+
+- break语句用于立即退出循环，**强制执行循环后的下一条语句**
+- continue语句也用于立即退出循环，但会**再次从循环顶部开始执行**
+
+```js
+for (let i = 0; i < 10; i++) {
+    if (i == 3) {
+        continue; // 跳过3
+    }
+
+    if (i == 7) {
+        break; // 当i为7时，结束循环
+    }
+    console.log(i);
+}
+
+first: for (let i = 0; i < 10; i++) {
+    second: for (let j = 0; j < 10; j ++) {
+        if (i == 3) {
+            continue second; // 跳出小循环
+        }
+
+        if (i == 4 && j == 4) {
+            break first; // 结束整个大循环
+        }
+        console.log(j);
+    }
+    console.log("=================", i);
+}
+```
+
+
+
+#### *switch* 语句
+
+> switch语句在比较每个条件的值时会使用全等操作符，因此不会强制转换数据类型（比如，字符串"10"不等于数值10）
+
+```js
+let num = 10;
+switch (num) {
+    case "10":
+        console.log("10 == \"10\"");
+        break;
+    /*case 10:
+        console.log("10 == 10");
+        break;*/
+    default:
+        console.log("other");
+} // other
+```
+
