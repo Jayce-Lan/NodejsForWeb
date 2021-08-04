@@ -900,7 +900,7 @@ num将被赋值为6，因为6是表达式中最后一项。逗号操作符的这
 
 > ECMA-262描述了一些语句（也称为流控制语句），而ECMAScript中的大部分语法都体现在语句中。语句通常使用一或多个关键字完成既定的任务。语句可以简单，也可以复杂。简单的如告诉函数退出，复杂的如列出一堆要重复执行的指令
 
-#### *for-in* 语句
+#### *for-in* 语句（取键）
 
 > for-in语句是一种严格的迭代语句，用于枚举对象中的非符号键属性
 
@@ -917,7 +917,7 @@ for (const propName in window) {
 
 
 
-#### *for-of* 语句
+#### *for-of* 语句（取值）
 
 > for-of语句是一种严格的迭代语句，用于遍历可迭代对象的元素
 
@@ -1059,4 +1059,125 @@ switch (num) {
         console.log("other");
 } // other
 ```
+
+
+
+## 变量、作用域与内存
+
+### 原始值和引用值
+
+> ECMAScript变量可以包含两种不同类型的数据：原始值和引用值。原始值（primitive value）就是最简单的数据，引用值（reference value）则是由多个值构成的对象
+>
+> 换句话说，原始值就是常量赋值；引用值就是对象
+
+#### 动态属性
+
+- 原始值和引用值的定义方式很类似，都是创建一个变量，然后给它赋一个值
+- 不过，在变量保存了这个值之后，可以对这个值做什么，则大有不同
+- 对于引用值而言，可以随时添加、修改和删除其属性和方法
+- 原始值不能有属性，尽管尝试给原始值添加属性不会报错
+- 原始类型的初始化可以只使用原始字面量形式
+- 如果使用的是new关键字，则JavaScript会创建一个Object类型的实例，但其行为类似原始值
+
+```js
+// 引用值添加属性
+{
+    let person = new Object();
+    person.name = "Jayce";
+    console.log(person); // { name: 'Jayce' }
+    console.log(person.name); // Jayce
+}
+
+// 原始值不能添加属性
+{
+    let person = "Jayce";
+    person.age = 26;
+    console.log(person); // Jayce
+    console.log(person.age); // undefined
+}
+
+// 使用 new 关键字创建对象
+{
+    let name1 = "Jayce";
+    let name2 = new String("Jayce");
+    name1.age = 26;
+    name2.age = 26;
+
+    console.log(name1); // Jayce
+    console.log(name2); // [String: 'Jayce'] { age: 26 }
+    console.log(name2.toString()); // Jayce
+
+    console.log(name1.age); // undefined
+    console.log(name2.age); // 26
+}
+```
+
+
+
+#### 复制值
+
+- 除了存储方式不同，原始值和引用值在通过变量复制时也有所不同
+- 在通过变量把一个原始值赋值到另一个变量时，原始值会被复制到新变量的位置
+- 在把引用值从一个变量赋给另一个变量时，存储在变量中的值也会被复制到新变量所在的位置
+- 区别在于，这里复制的值实际上是一个指针，它指向存储在堆内存中的对象
+- 操作完成后，两个变量实际上指向同一个对象，因此一个对象上面的变化会在另一个对象上反映出来
+
+复制变量
+
+```js
+let num1 = 5;
+let num2 = num1;
+num2 = 6;
+
+console.log("num1", num1); // 5
+console.log("num2", num2); // 6
+```
+
+复制前
+
+|      |                 |
+| ---- | --------------- |
+| num1 | 5（Number类型） |
+
+复制后
+
+|      |                 |
+| ---- | --------------- |
+| num2 | 5（Number类型） |
+| num1 | 5（Number类型） |
+
+复制对象
+
+```js
+// 对象的浅拷贝
+/*
+在这个例子中，变量obj1保存了一个新对象的实例。然后，这个值被复制到obj2，此时两个变量都指向了同一个对象。在给obj1创建属性name并赋值后，通过obj2也可以访问这个属性，因为它们都指向同一个对象
+*/
+{
+    let obj1 = new Object();
+    let obj2 = obj1;
+    obj2.name = "Jayce";
+
+    console.log("obj1", obj1); // { name: 'Jayce' }
+    console.log("obj2", obj2); // { name: 'Jayce' }
+}
+
+// 对象的深拷贝
+{
+    let obj1 = new Object();
+    let obj2 = JSON.parse(JSON.stringify(obj1));
+
+    obj2.name = "Jayce";
+
+    console.log("obj1", obj1); // {}
+    console.log("obj2", obj2); // { name: 'Jayce' }
+
+    console.log("obj1", typeof obj1);
+    console.log("obj2", typeof obj2);
+}
+```
+
+
+
+#### 传递参数
 
