@@ -6,7 +6,7 @@
 
 ### 基础相关
 
-- [*JavaScript* 学习路线]([nodejsDemo/JavaScript at master · Jayce-Lan/nodejsDemo (github.com)](https://github.com/Jayce-Lan/nodejsDemo/tree/master/JavaScript))
+- [*JavaScript* 学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/JavaScript)
 
 - [*CSS* 学习路线](https://github.com/Jayce-Lan/nodejsDemo/tree/master/CSS)
 
