@@ -1219,3 +1219,52 @@ setName(obj);
 console.log("obj", obj); // { name: 'Jayce' }
 ```
 
+
+
+#### 确定类型
+
+##### *typeof*
+
+- typeof操作符最适合用来判断一个变量是否为原始类型
+- 它是判断一个变量是否为字符串、数值、布尔值或undefined的最好方式
+- 如果值是对象或null，那么typeof返回"object"
+
+```js
+let str = "Hello";
+let _number = 22;
+let _boolean = true;
+let booleanObj = new Boolean();
+let _undefined;
+let _null = null;
+let obj = new Object();
+
+console.log("str", typeof str); // str
+console.log("number", typeof _number); // number
+console.log("boolean", typeof _boolean); // boolean
+console.log("booleanObj", typeof booleanObj); // object
+console.log("undefined", typeof _undefined); // undefined
+console.log("null", typeof _null); // object
+console.log("obj", typeof obj); // object
+```
+
+
+
+##### *instanceof*
+
+> typeof虽然对原始值很有用，但它对引用值的用处不大。我们通常不关心一个值是不是对象，而是想知道它是什么类型的对象。为了解决这个问题，ECMAScript提供了instanceof操作符
+
+- 如果变量是给定引用类型（由其原型链决定）的实例，则instanceof操作符返回true
+- 所有引用值都是Object的实例，因此通过instanceof操作符检测任何引用值和Object构造函数都会返回true
+- 类似地，如果用instanceof检测原始值，则始终会返回false，因为原始值不是对象
+
+```js
+let num = 22;
+let numObj = new Number(22);
+
+console.log("num", num instanceof Number); // false
+console.log("num", num instanceof Object); // false
+console.log("numObj", numObj instanceof Number); // true
+console.log("numObj", numObj instanceof Object); // true
+console.log(num == numObj); // true
+```
+
