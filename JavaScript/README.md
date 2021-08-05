@@ -1475,3 +1475,107 @@ function addVector(a, b, resultant) {
 
 
 ## 基本引用类型
+
+> 引用值（或者对象）是某个特定引用类型的实例。在ECMAScript中，引用类型是把数据和功能组织到一起的结构，经常被人错误地称作“类”。虽然从技术上讲JavaScript是一门面向对象语言，但ECMAScript缺少传统的面向对象编程语言所具备的某些基本结构，包括类和接口。引用类型有时候也被称为对象定义，因为它们描述了自己的对象应有的属性和方法
+
+- 对象被认为是某个特定引用类型的实例。新对象通过使用new操作符后跟一个构造函数（constructor）来创建
+- 构造函数就是用来创建新对象的函数
+
+### *Data*
+
+> ECMAScript的Date类型参考了Java早期版本中的java.util.Date。为此，Date类型将日期保存为自协调世界时（UTC, Universal Time Coordinated）时间1970年1月1日午夜（零时）至今所经过的毫秒数。使用这种存储格式，Date类型可以精确表示1970年1月1日之前及之后285616年的日期
+
+- 在不给Date构造函数传参数的情况下，创建的对象将保存当前日期和时间
+- 要基于其他日期和时间创建日期对象，必须传入其毫秒表示（UNIX纪元1970年1月1日午夜之后的毫秒数）
+- ECMAScript为此提供了两个辅助方法：Date.parse()和Date.UTC()
+
+创建日期对象
+
+```js
+let now  = new Date();
+```
+
+
+
+#### *Data.parse()*
+
+> Date.parse()方法接收一个表示日期的字符串参数，尝试将这个字符串转换为表示该日期的毫秒数
+
+- **月/日/年** 如 *"08/05/2021"*
+- **月名 日, 年** 如 *"May 3, 2021"*
+- **周几 月名 日 年 时:分:秒 时区** 如 *"Tue May 232019 00:00:00GMT-0700"*
+- ISO 8601扩展格式 **YYYY-MM-DDTHH:mm:ss.sssZ** 如 *2021-08-05T12:00:49*（只适用于兼容ES5的实现）
+
+```js
+let _date = new Date();
+console.log(_date); // 2021-08-05T04:01:56.294Z
+
+_date = new Date(Date.parse("08/05/2021"));
+console.log(_date); // 2021-08-04T16:00:00.000Z
+
+_date = new Date(Date.parse("May 3, 2021"));
+console.log(_date); // 2021-05-02T16:00:00.000Z
+```
+
+
+
+#### *Data.UTC()*
+
+> Date.UTC()方法也返回日期的毫秒表示，但使用的是跟Date.parse()不同的信息来生成这个值
+
+- 传给Date.UTC()的参数是年、零起点月数（1月是0,2月是1，以此类推）、日（1~31）、时（0~23）、分、秒和毫秒
+- 这些参数中，只有前两个（年和月）是必需的。如果不提供日，那么默认为1日
+- 其他参数的默认值都是0
+
+```js
+let _data = new Date(Date.UTC(2021, 8));
+console.log(_data); // 2021-09-01T00:00:00.000Z
+
+_data = new Date(Date.UTC(2021, 8, 4, 15, 1, 33));
+console.log(_data); // 2021-09-04T15:01:33.000Z
+```
+
+
+
+#### *Date.now()*
+
+> ECMAScript还提供了Date.now()方法，返回表示方法执行时日期和时间的毫秒数
+
+
+
+#### 继承的方法
+
+- 与其他类型一样，Date类型重写了toLocaleString()、toString()和valueOf()方法
+- 但与其他类型不同，重写后这些方法的返回值不一样
+- Date类型的toLocaleString()方法返回与浏览器运行的本地环境一致的日期和时间。这通常意味着格式中包含针对时间的AM（上午）或PM（下午），但不包含时区信息（具体格式可能因浏览器而不同）
+- toString()方法通常返回带时区信息的日期和时间，而时间也是以24小时制（0~23）表示的
+
+```js
+let _data = new Date(2021, 7, 5); // 2021-08-04T16:00:00.000Z
+console.log(_data);
+```
+
+
+
+
+
+#### 日期格式化方法
+
+- *toDateString()* 显示日期中的周几、月、日、年（格式特定于实现）
+- *toTimeString()* 显示日期中的时、分、秒和时区（格式特定于实现）
+- *toLocaleDateString()* 显示日期中的周几、月、日、年（格式特定于实现和地区）
+- *toLocaleTimeString()* 显示日期中的时、分、秒（格式特定于实现和地区）
+- *toUTCString()* 显示完整的UTC日期（格式特定于实现）
+- *toGMTString()* 这个方法跟toUTCString()是一样的，目的是为了向后兼容。不过，规范建议新代码使用toUTCString()
+
+```js
+let _data = new Date();
+
+console.log("toDateString", _data.toDateString()); // Thu Aug 05 2021
+console.log("toTimeString", _data.toTimeString()); // 17:35:47 GMT+0800 (中国标准时间)
+console.log("toLocaleDateString", _data.toLocaleDateString()); // 2021/8/5
+console.log("toLocaleTimeString", _data.toLocaleTimeString()); // 下午5:42:30
+console.log("toLocaleString", _data.toLocaleString()); // 2021/8/5 下午5:42:54
+console.log("toUTCString", _data.toUTCString()); // Thu, 05 Aug 2021 09:43:31 GMT
+```
+
