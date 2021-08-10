@@ -1785,3 +1785,154 @@ if (regExp.test(text)) {
 - RegExp还有其他几个构造函数属性，可以存储最多9个捕获组的匹配项
 - 这些属性通过***RegExp.$1~RegExp.$9***来访问，分别包含第1~9个捕获组的匹配项
 - 在调用exec()或test()时，这些属性就会被填充
+
+
+
+### 原始值包装类型
+
+> 为了方便操作原始值，ECMAScript提供了3种特殊的引用类型：Boolean、Number和String
+>
+> 虽然不推荐显式创建原始值包装类型的实例，但它们对于操作原始值的功能是很重要的。每个原始值包装类型都有相应的一套方法来方便数据操作
+
+#### *Boolean*
+
+> Boolean是对应布尔值的引用类型。要创建一个Boolean对象，就使用Boolean构造函数并传入true或false
+>
+
+```js
+let booleanObj = new Boolean(true);
+```
+
+- Boolean的实例会重写valueOf()方法，返回一个原始值true或false
+- toString()方法被调用时也会被覆盖，返回字符串"true"或"false"
+- 不过，Boolean对象在ECMAScript中用得很少
+- 不仅如此，它们还容易引起误会，尤其是在布尔表达式中使用Boolean对象时
+
+在这段代码中，我们创建一个值为false的Boolean对象。然后，在一个布尔表达式中通过&&操作将这个对象与一个原始值true组合起来。在布尔算术中，false &&true等于false。可是，这个表达式是对falseObject对象而不是对它表示的值（false）求值。所有对象在布尔表达式中都会自动转换为true，因此falseObject在这个表达式里实际上表示一个true值。那么true && true当然是true
+
+```js
+let falseObj = new Boolean(false);
+console.log("falseObj", falseObj && true); // true
+console.log("falseObj", typeof falseObj); // object
+let falseValue = false;
+console.log("falseValue", falseValue && true); // false
+console.log("falseValue", typeof falseValue); // boolean
+```
+
+
+
+#### *Number*
+
+> Number是对应数值的引用类型。要创建一个Number对象，就使用Number构造函数并传入一个数值s
+
+- 与Boolean类型一样，Number类型重写了valueOf()、toLocaleString()和toString()方法
+- valueOf()方法返回Number对象表示的原始数值，另外两个方法返回数值字符串
+- toString()方法可选地接收一个表示基数的参数，并返回相应基数形式的数值字符串
+
+```js
+let num = 10;
+console.log("toString()", num.toString()); // 10
+console.log("toString(2)", num.toString(2)); // 1010
+console.log("toString(8)", num.toString(8)); // 12
+console.log("toString(10)", num.toString(10)); // 10
+console.log("toString(16)", num.toString(16)); // a
+```
+
+
+
+除了继承的方法，Number类型还提供了几个用于将数值格式化为字符串的方法
+
+##### *toFixed()*
+
+> toFixed()方法返回包含指定小数点位数的数值字符串，原理是四舍五入
+
+- toFixed()自动舍入的特点可以用于处理货币
+- 不过要注意的是，多个浮点数值的数学计算不一定得到精确的结果
+  - 比如，0.1 + 0.2 = 0.30000000000000004
+
+```js
+const PI = 3.141592653;
+console.log(PI.toFixed()); // 3
+console.log(PI.toFixed(2)); // 3.14
+console.log(PI.toFixed(3)); // 3.142
+```
+
+
+
+##### *toExponential()*
+
+> 另一个用于格式化数值的方法是toExponential()，返回以科学记数法（也称为指数记数法）表示的数值字符串。与toFixed()一样，toExponential()也接收一个参数，表示结果中小数的位数
+
+```js
+const NUM = 10;
+console.log("toExponential()", NUM.toExponential()); // 1e+1
+console.log("toExponential(1)", NUM.toExponential(1)); // 1.0e+1
+```
+
+
+
+##### *toPrecision()*
+
+> toPrecision()方法会根据情况返回最合理的输出结果，可能是固定长度，也可能是科学记数法形式。这个方法接收一个参数，表示结果中数字的总位数（不包含指数）
+
+```js
+const NUM = 99;
+// 首先要用1位数字表示数值99，得到"1e+2"，也就是100。
+// 因为99不能只用1位数字来精确表示，所以这个方法就将它舍入为100，这样就可以只用1位数字（及其科学记数法形式）来表示了
+console.log("toPrecision(1)", NUM.toPrecision(1)); // 1e+2
+console.log("toPrecision(2)", NUM.toPrecision(2)); // 99
+console.log("toPrecision(3)", NUM.toPrecision(3)); // 99.0
+```
+
+
+
+- 与Boolean对象类似，Number对象也为数值提供了重要能力
+- 但是，考虑到两者存在同样的潜在问题，因此并不建议直接实例化Number对象
+- 在处理原始数值和引用数值时，typeof和instacnceof操作符会返回不同的结果
+
+```js
+let numObj = new Number(10);
+let numValue = 10;
+console.log("numObj", typeof numObj); // object
+console.log("numValue", typeof numValue); // number
+console.log("numObj", numObj instanceof Number); // true
+console.log("numValue", numValue instanceof Number); // false
+```
+
+
+
+##### *Number.isInteger()* 方法与安全整数
+
+###### *Number.isInteger()*
+
+> ES6新增了Number.isInteger()方法，用于辨别一个数值是否保存为整数。有时候，小数位的0可能会让人误以为数值是一个浮点值
+
+```js
+console.log(Number.isInteger(new Number(10))); // false
+console.log(Number.isInteger(new Number(10.0))); // false
+console.log(Number.isInteger(new Number(10.01))); // false
+console.log(Number.isInteger(1)); // true
+console.log(Number.isInteger(1.0)); // true
+console.log(Number.isInteger(1.01)); // false
+console.log(Number.isInteger(Number("1"))); // true
+console.log(Number.isInteger(Number("1.0"))); // true
+console.log(Number.isInteger(Number("1.01"))); // false
+```
+
+
+
+###### 安全整数（*Number.isSafeInteger()*）
+
+> IEEE 754数值格式有一个特殊的数值范围，在这个范围内二进制值可以表示一个整数值
+
+- 这个数值范围从Number.MIN_SAFE_INTEGER（-253+ 1）到Number.MAX_SAFE_INTEGER（253-1）
+- 对超出这个范围的数值，即使尝试保存为整数，IEEE 754编码格式也意味着二进制值可能会表示一个完全不同的数值
+- 为了鉴别整数是否在这个范围内，可以使用Number.isSafeInteger()方法
+
+```js
+console.log("isSafeInteger", Number.isSafeInteger(-1 * (2 ** 53))); // fals
+console.log("isSafeInteger", Number.isSafeInteger(-1 * (2 ** 53) + 1)); // true
+console.log("isSafeInteger", Number.isSafeInteger(2 ** 53)); // false
+console.log("isSafeInteger", Number.isSafeInteger(2 ** 53 - 1)); // true
+```
+
