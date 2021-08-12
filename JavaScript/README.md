@@ -1,5 +1,7 @@
 # JavaScript
 
+[TOC]
+
 ## 语言基础
 
 ### 数据类型
@@ -2410,3 +2412,33 @@ console.log(msg.anchor("name")); // <a name="name">标签内的内容</a>
 | String.sub()            | \<sub>str\</sub>                 |
 | String.sup()            | \<sup>str\</sup>                 |
 
+
+
+### 单例内置对象
+
+> ECMA-262对内置对象的定义是“任何由ECMAScript实现提供、与宿主环境无关，并在ECMAScript程序开始执行时就存在的对象”。这就意味着，开发者不用显式地实例化内置对象，因为它们已经实例化好了
+
+前面所接触到的内置对象：
+
+- Object
+- Array
+- String
+
+单例内置对象：
+
+- Global
+- Math
+
+
+
+#### *Global*
+
+- Global对象是ECMAScript中最特别的对象，因为代码不会显式地访问它
+- ECMA-262规定Global对象为一种兜底对象，它所针对的是不属于任何对象的属性和方法
+- 事实上，不存在全局变量或全局函数这种东西。在全局作用域中定义的变量和函数都会变成Global对象的属性
+
+
+
+
+
+#### Math
