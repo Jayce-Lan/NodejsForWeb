@@ -61,7 +61,7 @@
     console.log(Number.isInteger(Number("1.01"))); // false
 }
 
-//
+// Number.isSafeInteger()
 {
     console.log("isSafeInteger", Number.isSafeInteger(-1 * (2 ** 53))); // false
     console.log("isSafeInteger", Number.isSafeInteger(-1 * (2 ** 53) + 1)); // true

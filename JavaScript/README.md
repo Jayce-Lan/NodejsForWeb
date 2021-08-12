@@ -1936,3 +1936,477 @@ console.log("isSafeInteger", Number.isSafeInteger(2 ** 53)); // false
 console.log("isSafeInteger", Number.isSafeInteger(2 ** 53 - 1)); // true
 ```
 
+
+
+#### *String*
+
+> String是对应字符串的引用类型。要创建一个String对象，使用String构造函数并传入一个数值
+
+```js
+let stringObj = new String("HelloWorld!");
+```
+
+- String对象的方法可以在所有字符串原始值上调用
+- 3个继承的方法valueOf()、toLocaleString()和toString()都返回对象的原始字符串值
+- 每个String对象都有一个length属性，表示字符串中字符的数量
+
+
+
+*String* 类型提供了很多方法来解析和操作字符串
+
+##### *JavaScript* 字符
+
+> JavaScript字符串使用了两种Unicode编码混合的策略：UCS-2和UTF-16。对于可以采用16位编码的字符（U+0000~U+FFFF），这两种编码实际上是一样的
+
+
+
+###### *length*
+
+> JavaScript字符串由16位码元（code unit）组成。对多数字符来说，每16位码元对应一个字符。换句话说，字符串的length属性表示字符串包含多少16位码元
+
+```js
+let msg = "Hello World!";
+console.log("length", msg.length); // 12 包含了空格
+msg = `
+`;
+console.log("length", msg.length); // 1 回车
+msg = '    '
+console.log("length", msg.length); // 4 tab(设置为4)
+```
+
+
+
+###### *charAt()*
+
+> charAt()方法返回给定索引位置的字符，由传给方法的整数参数指定。具体来说，这个方法查找指定索引位置的16位码元，并返回该码元对应的字符
+
+```js
+let msg = "Hello World!";
+console.log("charAt", msg.charAt(1)); // e
+```
+
+
+
+###### *charCodeAt()*
+
+>使用charCodeAt()方法可以查看指定码元的字符编码。这个方法返回指定索引位置的码元值，索引以整数指定
+
+```js
+let msg = "Hello World!";
+console.log("charCodeAt", msg.charCodeAt(2)); // 108
+console.log("十进制和十六进制对比", 99 === 0x63); // true
+```
+
+
+
+###### *String.fromCharCode()*
+
+> String.fromCharCode()方法用于根据给定的UTF-16码元创建字符串中的字符。这个方法可以接受任意多个数值，并返回将所有数值对应的字符拼接起来的字符串
+
+```js
+console.log("fromCharCode", String.fromCharCode(189, 43, 190, 61)); // ½+¾=
+console.log("fromCharCode", String.fromCharCode(0x61, 0x62, 0x63, 0x64, 0x65)); // abcde
+console.log("fromCharCode", String.fromCharCode(97, 98, 99, 100, 101)); // abcde
+```
+
+- 对于U+0000~U+FFFF范围内的字符，length、charAt()、charCodeAt()和fromCharCode()返回的结果都跟预期是一样的
+- 这是因为在这个范围内，每个字符都是用16位表示的，而这几个方法也都基于16位码元完成操作
+- 只要字符编码大小与码元大小一一对应，这些方法就能如期工作
+- 这个对应关系在扩展到Unicode增补字符平面时就不成立了
+- 16位只能唯一表示65536个字符。这对于大多数语言字符集是足够了，在Unicode中称为基本多语言平面（BMP）
+- 为了表示更多的字符，Unicode采用了一个策略，即每个字符使用另外16位去选择一个增补平面。这种每个字符使用两个16位码元的策略称为代理对
+
+
+
+###### *codePointAt()*
+
+- 为正确解析既包含单码元字符又包含代理对字符的字符串，**可以使用codePointAt()来代替charCodeAt()**
+- 跟使用charCodeAt()时类似，codePointAt()接收16位码元的索引并返回该索引位置上的码点（code point）。码点是Unicode中一个字符的完整标识
+- 与charCodeAt()有对应的codePointAt()一样，fromCharCode()也有一个对应的fromCodePoint()。这个方法接收任意数量的码点，返回对应字符拼接起来的字符串
+
+
+
+##### *normalize()*方法
+
+> 某些Unicode字符可以有多种编码方式。有的字符既可以通过一个BMP字符表示，也可以通过一个代理对表示
+
+- 为解决这个问题，Unicode提供了4种规范化形式，可以将类似上面的字符规范化为一致的格式，无论底层字符的代码是什么
+- 这4种规范化形式是：
+  - NFD（Normalization Form D）
+  - NFC（Normalization Form C）
+  - NFKD（Normalization Form KD）
+  - NFKC（Normalization Form KC）
+- 可以使用normalize()方法对字符串应用上述规范化形式，使用时需要传入表示哪种形式的字符串："NFD"、"NFC"、"NFKD"或"NFKC"
+
+
+
+##### 字符串操作方法
+
+###### *concat()* 【尽量避免使用】
+
+> 用于将一个或多个字符串拼接成一个**新字符串**（强烈建议使用赋值操作符（`+`, `+=`）代替 `concat` 方法）
+
+```js
+let str = "Hello";
+let newStr = str.concat("World", "!")
+console.log(str); // Hello
+console.log(newStr); // HelloWorld!
+```
+
+
+
+ECMAScript提供了3个从字符串中提取子字符串的方法
+
+- slice()
+- substr()
+- substring()
+
+
+
+###### *slice()*
+
+> 提取某个字符串的一部分，并返回一个新的字符串，且**不会改动原字符串**
+
+```js
+let str = "Hello World!";
+console.log(str.slice(3)); // lo World!
+console.log(str.slice(0, 3)); // Hel
+
+console.log(str.slice(-3)); // ld!
+console.log(str.slice(-5, -3)); // or
+console.log(str.slice(4, -1)); // o World
+```
+
+隐藏手机号
+
+```js
+str = "13788996600";
+console.log(str.slice(0, 3) + "****" + str.slice(-4)); // 137****6600
+```
+
+
+
+###### *substr()* 【尽量避免使用】
+
+> 方法返回一个字符串中从指定位置开始到指定字符数的字符
+>
+> 尽管 `String.prototype.substr(…)` 没有严格被废弃 (as in "removed from the Web standards"), 但它被认作是遗留的函数并且可以的话应该避免使用。它并非JavaScript核心语言的一部分，未来将可能会被移除掉。如果可以的话，使用 `substring()` 替代它
+
+```js
+let str = "abcdefgh";
+console.log(str.substr(3)); // defgh
+console.log(str.substr(3, 4)); // defg
+console.log(str.substr(-3)); // fgh
+console.log(str.substr(-3, 2)); // fg
+```
+
+
+
+###### *substring()*
+
+> 方法返回一个字符串在开始索引到结束索引之间的一个子集, 或从开始索引直到字符串的末尾的一个子集
+
+- 如果 `indexStart` 等于 `indexEnd`，`substring` 返回一个空字符串。
+- 如果省略 `indexEnd`，`substring` 提取字符一直到字符串末尾。
+- 如果任一参数小于 0 或为 `NaN`，则被当作 0。
+- 如果任一参数大于 `stringName.length`，则被当作 `stringName.length`。
+- 如果 `indexStart` 大于 `indexEnd`，则 `substring` 的执行效果就像两个参数调换了一样
+
+```js
+let str = "abcdefg"
+console.log(str.substring(3)); // defg
+console.log(str.substring(3, 1)); // bc
+console.log(str.substring(-3, 1)); // a
+console.log(str.substring(3, -1)); // abc
+```
+
+
+
+###### *indexOf()* & *lastIndexOf()*
+
+- 有两个方法用于在字符串中定位子字符串
+  - indexOf()和
+  - lastIndexOf()
+- 这两个方法从字符串中搜索传入的字符串，并返回位置（如果没找到，则返回-1）
+- 两者的区别在于
+  - indexOf()方法从字符串开头开始查找子字符串
+  - lastIndexOf()方法从字符串末尾开始查找子字符串
+- 这两个方法都可以接收可选的第二个参数，表示开始搜索的位置
+  - indexOf()会从这个参数指定的位置开始向字符串末尾搜索，忽略该位置之前的字符
+  - lastIndexOf()则会从这个参数指定的位置开始向字符串开头搜索，忽略该位置之后直到字符串末尾的字符
+
+```js
+let msg = "Hello, World!";
+console.log("indexOf", msg.indexOf("o")); // 4
+console.log("lastIndexOf", msg.lastIndexOf("o")); // 8
+console.log("indexOf", msg.indexOf("o", 7)); // 8
+console.log("lastIndexOf", msg.lastIndexOf("o", 7)); // 4
+```
+
+关于 *undefined* 
+
+```js
+console.log('undefined'.indexOf()); // 0(搜索undefined)
+console.log('undefine'.indexOf()); // -1
+// 以上等价与 str.indexOf(undefined)
+```
+
+
+
+##### 字符串包含方法
+
+> ECMAScript 6增加了3个用于判断字符串中是否包含另一个字符串的方法：startsWith()、endsWith()和includes()
+
+###### *startsWith()、endsWith()和includes()*
+
+- *startsWith()* 检查开始于索引0的匹配项
+- *endsWith()* 检查开始于索引(string.length -substring.length)的匹配项
+- *includes()* 检查整个字符串
+
+```js
+let msg = "foobazbar";
+console.log("startsWith", msg.startsWith("foo")); // true
+console.log("startsWith", msg.startsWith("baz")); // false
+console.log("endsWith", msg.endsWith("bar")); // true
+console.log("endsWith", msg.endsWith("baz")); // false
+console.log("includes", msg.includes("oo")); // true
+console.log("includes", msg.includes("baz")); // true
+console.log("includes", msg.includes("baa")); // false
+```
+
+
+
+- startsWith()和includes()方法接收可选的第二个参数，表示开始搜索的位置
+  - 如果传入第二个参数，则意味着这两个方法会从指定位置向着字符串末尾搜索，忽略该位置之前的所有字符
+- endsWith()方法接收可选的第二个参数，表示应该当作字符串末尾的位置
+  - 如果不提供这个参数，那么默认就是字符串长度
+  - 如果提供这个参数，那么就好像字符串只有那么多字符一样
+
+```js
+console.log("startsWith", msg.startsWith("foo", 3)); // fals
+console.log("startsWith", msg.startsWith("baz", 3)); // true
+console.log("includes", msg.includes("baz"), 3); // true
+console.log("includes", msg.includes("baz", 4)); // false
+console.log("endsWith", msg.endsWith("bar", 6)); // false
+console.log("endsWith", msg.endsWith("baz", 6)); // true
+```
+
+
+
+##### *trim()*
+
+- ECMAScript在所有字符串上都提供了trim()方法。这个方法会创建字符串的一个副本，删除前、后所有空格符，再返回结果
+- 由于trim()返回的是字符串的副本，因此原始字符串不受影响，即原本的前、后空格符都会保留
+- 另外，trimLeft()和trimRight()方法分别用于从字符串开始和末尾清理空格符
+
+```js
+let msg = " Hello World! ";
+let trimMsg = msg.trim();
+console.log("trim", msg); // " Hello World! "
+console.log("trim", trimMsg); // "Hello World!"
+console.log("trim", msg.trimLeft()); // "Hello World! "
+console.log("trim", msg.trimRight()); // " Hello World!"
+console.log("trim", msg.trimStart()); // "Hello World! "
+console.log("trim", msg.trimEnd()); // " Hello World!"
+```
+
+
+
+##### *repeat()*
+
+> ECMAScript在所有字符串上都提供了repeat()方法。这个方法接收一个整数参数，表示要将字符串复制多少次，然后返回拼接所有副本后的结果
+
+```js
+let msg = "hello ";
+console.log(msg.repeat(0)); // ""
+console.log(msg.repeat(6)); // 复制6次
+console.log(msg.repeat(3.5)); // 会自动转换为整数 复制3次
+// console.log(msg.repeat(-1)); // RangeError: Invalid count value
+```
+
+
+
+##### *padStart() & padEnd()*
+
+- padStart()和padEnd()方法会复制字符串，如果小于指定长度，则在相应一边填充字符，直至满足长度条件
+- 这两个方法的第一个参数是长度，第二个参数是可选的填充字符串，默认为空格（U+0020）
+
+```js
+let msg = "Script";
+console.log("padStart", msg.padStart(10, "Java")); // JavaScript
+console.log("padStart", msg.padStart(10, "Type")); // TypeScript
+console.log("padStart", msg.padStart(10, "Something")); // Some
+console.log("padStart", msg.padStart(3)); // Script
+
+msg = "Java";
+console.log("padEnd", msg.padEnd(10, "Script")); //JavaScript
+console.log("padEnd", msg.padEnd(10, "Something")); //JavaSometh
+console.log("padEnd", msg.padEnd(3)); //Java
+```
+
+
+
+修改手机号码
+
+```js
+msg = "13988669900";
+console.log(msg.slice(0, 3) + msg.slice(-4).padStart(8, "*"));
+```
+
+
+
+##### 字符串迭代与解构（*iterator*）
+
+> 字符串的原型上暴露了一个 *@@iterator* 方法，表示可以迭代字符串的每个字符
+
+```js
+let msg = "Hello";
+let stringIterator = msg[Symbol.iterator]();
+
+console.log(typeof stringIterator); // object
+console.log(stringIterator.next()); // { value: 'H', done: false }
+console.log(stringIterator.next()); // { value: 'e', done: false }
+console.log(stringIterator.next()); // { value: 'l', done: false }
+console.log(stringIterator.next()); // { value: 'l', done: false }
+console.log(stringIterator.next()); // { value: 'o', done: false }
+console.log(stringIterator.next()); // { value: undefined, done: true }
+```
+
+
+
+有了这个迭代器之后，字符串就可以通过解构操作符来解构了。比如，可以更方便地把字符串分割为字符数组
+
+```js
+let msg = "Hello";
+
+for (const c of msg) {
+    console.log(c);
+}
+```
+
+
+
+##### 字符串大小写转换
+
+- 下一组方法涉及大小写转换，包括4个方法：
+  - toLowerCase()
+  - toLocaleLowerCase()
+  - toUpperCase()
+  - toLocaleUpperCase()
+- toLowerCase()和toUpperCase()方法是原来就有的方法，与java.lang.String中的方法同名
+- toLocaleLowerCase()和toLocaleUpperCase()方法旨在基于特定地区实现
+
+
+
+##### 字符串模式匹配方法
+
+> String类型专门为在字符串中实现模式匹配设计了几个方法
+
+###### *match()*
+
+> 这个方法本质上跟RegExp对象的exec()方法相同。match()方法接收一个参数，可以是一个正则表达式字符串，也可以是一个RegExp对象
+
+match()方法返回的数组与RegExp对象的exec()方法返回的数组是一样的：第一个元素是与整个模式匹配的字符串，其余元素则是与表达式中的捕获组匹配的字符串（如果有的话）
+
+```js
+let msg = "Hello, Jayce Lan";
+let regExp = /[A-Z]/g;
+
+console.log("exec", regExp.exec(msg)); // ["H", 0, "Hello, Jayce Lan", undefined]
+console.log("match", msg.match(regExp)); // ["H", "J", "L"]
+```
+
+
+
+###### *search()*
+
+- 这个方法唯一的参数与match()方法一样：正则表达式字符串或RegExp对象
+- 这个方法返回模式第一个匹配的位置索引，如果没找到则返回-1
+- search()始终从字符串开头向后匹配模式
+
+```js
+let msg = "Hello, Jayce Lan";
+let regExp = /[A-Z]/g;
+
+console.log("search", msg.search(regExp)); // 0
+```
+
+
+
+###### *replace()*
+
+> 为简化子字符串替换操作，ECMAScript提供了replace()方法
+
+- 这个方法接收两个参数，第一个参数可以是一个RegExp对象或一个字符串（这个字符串不会转换为正则表达式），第二个参数可以是一个字符串或一个函数
+  - 如果第一个参数是字符串，那么只会替换第一个子字符串
+  - 要想替换所有子字符串，第一个参数必须为正则表达式并且带全局标记
+
+```js
+let msg = "bat cat pat bar";
+let regExp = /at/g;
+console.log("replace", msg.replace("at", "od")); // bod cat pat bar
+console.log("replace", msg.replace(regExp, "od")); // bod cod pod bar
+```
+
+
+
+第二个参数是字符串的情况下，有几个特殊的字符序列，可以用来插入正则表达式操作的值
+
+| 字符序列 | 替换文本                                                   |
+| -------- | ---------------------------------------------------------- |
+| $$       | $                                                          |
+| $&       | 匹配整个模式的子字符串，与 *RegExp.lastMatch* 相同         |
+| $'       | 匹配的子字符串之前的字符串，与 *RegExp.rightContext* 相同  |
+| $`       | 匹配的子字符串之后的字符串，与 *RegExp.leftContext* 相同   |
+| $n       | 匹配第n个捕获的字符串，n=0~9，如果没有捕获，则为空字符串   |
+| $nn      | 匹配第n个捕获的字符串，n=01~99，如果没有捕获，则为空字符串 |
+
+
+
+##### *localeCompare()*
+
+> 这个方法比较两个字符串，返回如下3个值中的一个
+
+- 如果按照字母表顺序，字符串应该排在字符串参数前头，则返回负值（通常是-1，具体还要看与实际值相关的实现）
+- 如果字符串与字符串参数相等，则返回0
+- 如果按照字母表顺序，字符串应该排在字符串参数后头，则返回正值（通常是1，具体还要看与实际值相关的实现）
+- localeCompare()的独特之处在于，实现所在的地区（国家和语言）决定了这个方法如何比较字符串
+- 在美国，英语是ECMAScript实现的标准语言，localeCompare()区分大小写，大写字母排在小写字母前面
+- 但其他地区未必是这种情况
+
+```js
+let msg = "yellow";
+console.log(msg.localeCompare("blue")); // 1
+console.log(msg.localeCompare("yellow")); // 0
+console.log(msg.localeCompare("Yellow")); // -1
+console.log(msg.localeCompare("zoo")); // -1
+```
+
+
+
+##### *HTML* 方法
+
+> 早期的浏览器开发商认为使用JavaScript动态生成HTML标签是一个需求。因此，早期浏览器扩展了规范，增加了辅助生成HTML标签的方法。下表总结了这些HTML方法。不过，这些方法基本上已经没有人使用了，因为结果通常不是语义化的标记。
+
+```js
+let msg = "标签内的内容";
+console.log(msg.anchor("name")); // <a name="name">标签内的内容</a>
+```
+
+
+
+| 方法（String为 "str"）  | 输出                             |
+| ----------------------- | -------------------------------- |
+| String.anchor(name)     | \<a name="name">str\</a>         |
+| String.big()            | \<big>str\</big>                 |
+| String.bold()           | \<b>str\</b>                     |
+| String.fixed()          | \<tt>str\</tt>                   |
+| String.fontcolor(color) | \<font color="color">str\</font> |
+| String.fontsize(size)   | \<font size="size">str\</font>   |
+| String.italics()        | \<i>str\</i>                     |
+| String.link(url)        | \<a url="url">str\</a>           |
+| String.small()          | \<small>str\</small>             |
+| String.strike()         | \<strike>str\</strike>           |
+| String.sub()            | \<sub>str\</sub>                 |
+| String.sup()            | \<sup>str\</sup>                 |
+
