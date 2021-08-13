@@ -2431,14 +2431,256 @@ console.log(msg.anchor("name")); // <a name="name">标签内的内容</a>
 
 
 
-#### *Global*
+#### *Global*（全局）
 
 - Global对象是ECMAScript中最特别的对象，因为代码不会显式地访问它
 - ECMA-262规定Global对象为一种兜底对象，它所针对的是不属于任何对象的属性和方法
 - 事实上，不存在全局变量或全局函数这种东西。在全局作用域中定义的变量和函数都会变成Global对象的属性
 
+> 包括isNaN()、isFinite()、parseInt()和parseFloat()，实际上都是Global对象的方法。除了这些，Global对象上还有另外一些方法
+
+##### URL编码方法
+
+- *encodeURI()* 和 *encodeURIComponent()* 方法用于编码统一资源标识符（URI），以便传给浏览器
+- 有效的URI不能包含某些字符，比如空格
+- 使用URI编码方法来编码URI可以让浏览器能够理解它们，同时又以特殊的UTF-8编码替换掉所有无效字符
+  - ecnodeURI()方法用于对整个URI进行编码，比如"www.wrox.com/illegalvalue.js"
+  - 而encodeURIComponent()方法用于编码URI中单独的组件，比如前面URL中的"illegal value.js"
+  - 这两个方法的主要区别是，encodeURI()不会编码属于URL组件的特殊字符，比如冒号、斜杠、问号、井号，而encodeURIComponent()会编码它发现的所有非标准字符
+
+```js
+let uri = "http://www.wrox.com/illegal value.js#start";
+
+console.log("encodeURI", encodeURI(uri)); // http://www.wrox.com/illegal%20value.js#start
+console.log("encodeURIComponent", encodeURIComponent(uri)); // http%3A%2F%2Fwww.wrox.com%2Fillegal%20value.js%23start
+```
+
+- 与encodeURI()和encodeURIComponent()相对的是decodeURI()和decodeURIComponent()
+- decodeURI()只对使用encodeURI()编码过的字符解码
+- 例如，%20会被替换为空格，但%23不会被替换为井号（#），因为井号不是由encodeURI()替换的
+- 类似地，decodeURIComponent()解码所有被encodeURIComponent()编码的字符，基本上就是解码所有特殊值
+
+```js
+let uri = "http%3A%2F%2Fwww.wrox.com%2Fillegal%20value.js%23start";
+
+console.log(decodeURI(uri)); // http%3A%2F%2Fwww.wrox.com%2Fillegal value.js%23start
+console.log(decodeURIComponent(uri)); // http://www.wrox.com/illegal value.js#start
+```
 
 
 
+##### *eval()* 【不要使用】
 
-#### Math
+> *eval()*方法可能是整个ECMAScript语言中最强大的了，这个方法就是一个完整的ECMAScript解释器，它接收一个参数，即一个要执行的ECMAScript（JavaScript）字符串
+
+**MDN原话**
+
+> `eval()` 是一个危险的函数， 它使用与调用者相同的权限执行代码。如果你用 `eval()` 运行的字符串代码被恶意方（不怀好意的人）修改，您最终可能会在您的网页/扩展程序的权限下，在用户计算机上运行恶意代码。更重要的是，第三方代码可以看到某一个 `eval()` 被调用时的作用域，这也有可能导致一些不同方式的攻击。相似的 `Function`就不容易被攻击
+
+```js
+console.log("Hello JavaScript"); // Hello JavaScript
+// 互相等价
+eval(console.log("Hello JavaScript")); // Hello JavaScript
+```
+
+
+
+- 通过eval()定义的任何变量和函数都不会被提升，这是因为在解析代码的时候，它们是被包含在一个字符串中的
+- 在严格模式下，在eval()内部创建的变量和函数无法被外部访问
+
+```js
+eval(function sayHi() {
+    console.log("Hi!");
+});
+sayHi(); // Uncaught ReferenceError: sayHi is not defined
+```
+
+
+
+##### *Global* 对象属性
+
+| 属性           | 说明                      |
+| -------------- | ------------------------- |
+| undefined      | 特殊值 undefined          |
+| NaN            | 特殊值 NaN                |
+| Infinity       | 特殊值 Infinity           |
+| Object         | Object 的构造函数         |
+| Array          | Array 的构造函数          |
+| Function       | Function 的构造函数       |
+| Boolean        | Boolean 的构造函数        |
+| String         | String 的构造函数         |
+| Number         | Number 的构造函数         |
+| Date           | Date 的构造函数           |
+| RegExp         | RegExp 的构造函数         |
+| Symbol         | Symbol 的构造函数         |
+| Error          | Error 的构造函数          |
+| EvalError      | EvalError 的构造函数      |
+| RangeError     | RangeError 的构造函数     |
+| ReferenceError | ReferenceError 的构造函数 |
+| SyntaxError    | SyntaxError 的构造函数    |
+| TypeError      | TypeError 的构造函数      |
+| URIError       | URIError 的构造函数       |
+
+
+
+##### *window* 对象
+
+> 虽然ECMA-262没有规定直接访问Global对象的方式，但浏览器将window对象实现为Global对象的代理。因此，**所有全局作用域中声明的变量和函数都变成了window的属性**
+
+```html
+<script>
+    var color = "yellow";
+    function sayColor() {
+        console.log(window.color);
+    }
+    window.sayColor(); // yellow
+</script>
+```
+
+另一种获取全局属性的方式
+
+```html
+<script>
+let global = function () {
+    return this;
+};
+console.log(global());
+</script>
+```
+
+
+
+#### *Math*
+
+> ECMAScript提供了Math对象作为保存数学公式、信息和计算的地方。Math对象提供了一些辅助计算的属性和方法
+>
+> Math对象上提供的计算要比直接在JavaScript实现的快得多，因为Math对象上的计算使用了JavaScript引擎中更高效的实现和处理器指令。但使用Math计算的问题是精度会因浏览器、操作系统、指令集和硬件而异
+
+##### *Math* 对象属性
+
+> Math对象有一些属性，主要用于保存数学中的一些特殊值
+
+| 属性         | 说明                  |
+| ------------ | --------------------- |
+| Math.E       | 自然对数的基数 e 的值 |
+| Math.LN10    | 10 为底的自然对数     |
+| Math.LN2     | 2 为底的自然对数      |
+| Math.LOG2E   | 以 2 为底 e 的对数    |
+| Math.LOG10E  | 以 10 为底 e 的对数   |
+| Math.PI      | 圆周率的值            |
+| Math.SQRT1_2 | 1/2 的平方根          |
+| Math.SQRT2   | 2 的平方根            |
+
+
+
+##### *min()* 和 *max()* 方法
+
+> Math对象也提供了很多辅助执行简单或复杂数学计算的方法，min()和max()方法用于确定一组数值中的最小值和最大值。这两个方法都接收任意多个参数
+
+```js
+let max = Math.max(10, 59, 66, 8, 0, 9, -1);
+console.log("max", max); // 66
+let min = Math.min(10, 59, 66, 8, 0, 9, -1);
+console.log("min", min); // -1
+
+// 获取数组的最大最小值
+let arr = [-1, 3, 9, 78, 66];
+console.log("max", Math.max(...arr)); // 78
+console.log("min", Math.min(...arr)); // -1
+```
+
+
+
+##### 舍入方法
+
+- *Math.ceil()* 方法始终向上舍入为最接近的整数
+- *Math.floor()* 方法始终向下舍入为最接近的整数
+- *Math.round()* 方法执行四舍五入
+- *Math.fround()* 方法返回数值最接近的单精度（32位）浮点值表示
+
+```js
+console.log("Math.ceil", Math.ceil(25.1)); // Math.ceil 26
+console.log("Math.ceil", Math.ceil(25.4)); // Math.ceil 26
+console.log("Math.ceil", Math.ceil(25.5)); // Math.ceil 26
+console.log("Math.ceil", Math.ceil(25.9)); // Math.ceil 26
+
+console.log("Math.floor", Math.floor(25.1)); // Math.floor 25
+console.log("Math.floor", Math.floor(25.4)); // Math.floor 25
+console.log("Math.floor", Math.floor(25.5)); // Math.floor 25
+console.log("Math.floor", Math.floor(25.9)); // Math.floor 25
+
+console.log("Math.round", Math.round(25.1)); // Math.round 25
+console.log("Math.round", Math.round(25.4)); // Math.round 25
+console.log("Math.round", Math.round(25.5)); // Math.round 26
+console.log("Math.round", Math.round(25.9)); // Math.round 26
+
+console.log("Math.fround", Math.fround(.1)); // Math.fround 0.10000000149011612
+console.log("Math.fround", Math.fround(.4)); // Math.fround 0.4000000059604645
+console.log("Math.fround", Math.fround(.5)); // Math.fround 0.5
+console.log("Math.fround", Math.fround(.9)); // Math.fround 0.8999999761581421
+```
+
+
+
+##### *random()*
+
+> Math.random()方法返回一个0~1范围内的随机数，其中包含0但不包含1。对于希望显示随机名言或随机新闻的网页，这个方法是非常方便的
+
+```js
+// 取 1-10 的整数
+let randomNum = Math.floor
+console.log(randomNum);
+
+// 取 2-10 的整数
+randomNum = Math.floor(Mat
+console.log(randomNum);
+```
+
+
+
+###### *window.crypto. getRandomValues()*
+
+**注意**：如果是为了加密而需要生成随机数（传给生成器的输入需要较高的不确定性），那么建议使用***window.crypto. getRandomValues()***
+
+```html
+<script>
+    let arr = new Uint32Array(10)
+    window.crypto.getRandomValues(arr);
+    for (let item of arr) {
+        console.log(item);
+    }
+</script>
+```
+
+
+
+##### 其他方法
+
+| 方法                | 说明                                |
+| ------------------- | ----------------------------------- |
+| Math.abs(x)         | 返回 x 的绝对值                     |
+| Math.exp(x)         | 返回 Math.E 的 x 次幂               |
+| Math.expm1(x)       | 返回 x 的自然数                     |
+| Math.log(x)         | 返回 x 的自然对数                   |
+| Math.log1p(x)       | 等于 1 + Math.log(x)                |
+| Math.pow(x, power)  | 返回 x 的 power 次幂                |
+| Math.hypot(...nums) | 返回 nums 中每个数平方和的平方根    |
+| Math.clz32(x)       | 返回32位证书 x 的前置 0 的数量      |
+| Math.sign(x)        | 返回表示 x 的整数部分，删除所有小数 |
+| Math.trunc(x)       | 返回 x 的整数部分，删除所有小数     |
+| Math.sqrt(x)        | 返回 x 的平方根                     |
+| Math.cbrt(x)        | 返回 x 的立方根                     |
+| Math.acos(x)        | 返回 x 的反余弦                     |
+| Math.acosh(x)       | 返回 x 的反双曲余弦                 |
+| Math.asin(x)        | 返回 x 的反正弦                     |
+| Math.asinh(x)       | 返回 x 的反双曲正弦                 |
+| Math.atan(x)        | 返回 x 的反正切                     |
+| Math.atanh(x)       | 返回 x 的双曲反正切                 |
+| Math.tan2(y, x)     | 返回 y/x 的反正切                   |
+| Math.cos(x)         | 返回 x 的余弦                       |
+| Math.sin(x)         | 返回 x 的正弦                       |
+| Math.tan(x)         | 返回 x 的正切                       |
+
+
+
+## 集合引用类型
