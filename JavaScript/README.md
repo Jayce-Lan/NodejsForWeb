@@ -2684,3 +2684,88 @@ console.log(randomNum);
 
 
 ## 集合引用类型
+
+- 对象
+- 数组与定型数组
+- Map、WeakMap、Set以及WeakSet类型
+
+### *Object*
+
+> Object是ECMAScript中最常用的类型之一。虽然Object的实例没有多少功能，但很适合存储和在应用程序间交换数据
+
+
+
+#### 显式地创建Object实例的两种方式
+
+##### 使用new操作符和Object构造函数
+
+```js
+{
+    let obj = new Object();
+    obj.name = "Jayce";
+    obj.age = 25;
+    obj.job = "coder";
+    console.log(obj); // {name: "Jayce", age: 25, job: "coder"}
+
+    let obj2 = {}; // 等效于 new Object();
+    obj2.name = "Jayce";
+    obj2.age = 25;
+    obj2.job = "coder";
+    console.log(obj2); // { name: 'Jayce', age: 25, job: 'coder' }
+}
+```
+
+
+
+##### 对象字面量（object literal）
+
+> 虽然使用哪种方式创建Object实例都可以，但实际上开发者更倾向于使用对象字面量表示法。这是因为对象字面量代码更少，看起来也更有封装所有相关数据的感觉。事实上，对象字面量已经成为给函数传递大量可选参数的主要方式
+
+```js
+{
+    let obj = {
+        name: "Jayce",
+        age: 25,
+        job: "coder",
+    }
+
+    console.log(obj); // { name: 'Jayce', age: 25, job: 'coder' }
+}
+```
+
+
+
+##### 存取属性
+
+###### 点语法
+
+```js
+let obj = {
+    name: "Jayce",
+    age: 25
+}
+console.log(obj.name);
+```
+
+
+
+###### 中括号
+
+> 虽然属性一般是通过点语法来存取的，这也是面向对象语言的惯例，但也可以使用中括号来存取属性
+
+- 在使用中括号时，要在括号内使用属性名的字符串形式
+- 从功能上讲，和点语法存取属性的方式没有区别
+- 使用中括号的主要优势就是可以通过变量访问属性
+- 如果属性名中包含可能会导致语法错误的字符，或者包含关键字/保留字时，也可以使用中括号语法
+
+```js
+let obj = {
+    name: "Jayce",
+    age: 25,
+    "last name": "Lan",
+}
+console.log(obj["last name"]); // Lan
+let objAge = "age"
+console.log(obj[objAge]); // 25
+```
+
