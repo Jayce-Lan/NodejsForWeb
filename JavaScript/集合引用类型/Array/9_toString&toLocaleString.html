@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    let person1 = {
+        toString() {
+            return "Jayce";
+        },
+        toLocaleString() {
+            return "Jayce Lan";
+        }
+    }
+
+    let person2 = {
+        toString() {
+            return "Eason";
+        },
+        toLocaleString() {
+            return "Eason Chan";
+        }
+    }
+
+    let persons = [person1, person2];
+    alert(persons); // Jayce,Eason
+    alert(persons.toString()); // Jayce,Eason
+    alert(persons.toLocaleString()); // Jayce Lan,Eason Chan
+</script>
+</html>

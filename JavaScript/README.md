@@ -2769,3 +2769,455 @@ let objAge = "age"
 console.log(obj[objAge]); // 25
 ```
 
+
+
+### *Array*
+
+> 除了Object, Array应该就是ECMAScript中最常用的类型了。ECMAScript数组跟其他编程语言的数组有很大区别。跟其他语言中的数组一样，ECMAScript数组也是一组有序的数据，但跟其他语言不同的是，数组中每个槽位可以存储任意类型的数据。这意味着可以创建一个数组，它的第一个元素是字符串，第二个元素是数值，第三个是对象。ECMAScript数组也是动态大小的，会随着数据添加而自动增长
+
+
+
+#### 创建数组
+
+##### 使用 *Array* 构造函数
+
+```js
+let arr = new Array(); // 创建一个空数组
+console.log(typeof arr); // object
+```
+
+- 如果知道数组中元素的数量，那么可以给构造函数传入一个数值，然后length属性就会被自动创建并设置为这个值
+- 也可以给Array构造函数传入要保存的元素
+- 创建数组时可以给构造函数传一个值
+- 这时候会出现以下问题：
+  - 因为如果这个值是数值，则会创建一个长度为指定数值的数组
+  - 而如果这个值是其他类型的，则会创建一个只包含该特定值的数组
+- 在使用Array构造函数时，也可以省略new操作符
+
+```js
+ let arr3 = new Array(3); // Array(3) []
+ console.log(arr3);
+ let arr4 = new Array(3, 4,); // Array(2) [3, 4]
+ console.log(arr4);
+ let arr5 = new Array("item"); // Array(1) ["item"]
+ console.log(arr5);
+ let arr6 = Array("item", 3); // Array(2) ["item", 3]
+ console.log(arr6);
+```
+
+
+
+##### 数组字面量（array literal）
+
+- 数组字面量是在中括号中包含以逗号分隔的元素列表
+- 与对象一样，在使用数组字面量表示法创建数组不会调用Array构造函数
+
+```js
+let arr = [];
+console.log(typeof arr); // object
+let arr1 = [];
+console.log(arr1);
+let arr2 = [1, 2,]; // Array(2) [1, 2]
+console.log(arr2);
+let arr3 = ["item1", "item2", 3]; // Array(3) ["item1", "item2", 3]
+console.log(arr3);
+```
+
+
+
+##### ES6新增的用于创建数组的静态方法
+
+###### *Array.from()*
+
+> Array.from()方法从一个类似数组或可迭代对象创建一个新的，**浅拷贝**的数组实例
+
+- Array.from()的第一个参数是一个类数组对象，即任何可迭代的结构，或者有一个length属性和可索引元素的结构
+- Array.from()还接收第二个可选的映射函数参数。这个函数可以直接增强新数组的值，而无须像调用Array.from().map()那样先创建一个中间数组
+- 还可以接收第三个可选参数，用于指定映射函数中this的值。但这个重写的this值在箭头函数中不适用
+
+```js
+// 将字符串拆分为数组
+console.log("string", Array.from("Test Array")); //  Array(10) ["T", "e", "s", "t", " ", "A", "r", "r", "a", "y"]
+
+// 将集合和映射转换为新数组
+const map = new Map();
+map.set(1, 2)
+    .set(3, 4)
+    .set(5, 6);
+const set = new Set();
+set.add(1)
+    .add(2)
+    .add(3)
+    .add(4);
+console.log("map", Array.from(map)); // Array(3) [[1, 2], [3, 4], [5, 6]]
+console.log("set", Array.from(set)); // Array(4) [1, 2, 3, 4]
+
+// 对已有数组进行浅拷贝
+const arr1 = [1, 2, 3, 4];
+const arr2 = Array.from(arr1);
+console.log(arr1); // [ 1, 2, 3, 4 ]
+console.log(arr2); // [ 1, 2, 3, 4 ]
+arr2[2] = 6;
+console.log(arr1); // [ 1, 2, 3, 4 ]
+console.log(arr2); // [ 1, 2, 6, 4 ]
+
+// 可以使用任何可迭代对象
+const iter = {
+    *[Symbol.iterator]() {
+        yield 1;
+        yield 2;
+        yield 3;
+        yield 4;
+    }
+};
+console.log(iter); // {Symbol(Symbol.iterator): Function}
+console.log(typeof iter); // Object
+console.log(Array.from(iter)); // Array(4) [1, 2, 3, 4]
+
+// arguments 对象可以被转为数组
+function getArgsArray(...args) {
+    return Array.from(args);
+}
+console.log(getArgsArray(1, 2, 3, 4, 5)); // Array(5) [1, 2, 3, 4, 5]
+
+// 带有必要属性的自定义对象
+const obj = {
+    0: 1,
+    1: 2,
+    2: 3,
+    3: 4,
+    length: 4
+}
+console.log(Array.from(obj)); // Array(4) [1, 2, 3, 4]
+
+// 传入多个参数
+let a1 = [1, 2, 3, 4];
+let a2 = Array.from(a1, item => item ** 2);
+console.log("传入两个参数", a2); // Array(4) [1, 4, 9, 16]
+let a3 = Array.from(a1, function (item) {
+    return item ** this.exponent
+}, {exponent: 3});
+console.log("传入三个参数", a3); // Array(4) [1, 8, 27, 64]
+```
+
+
+
+###### *of()*
+
+> of()用于将一组参数转换为数组实例；这个方法用于替代在ES6之前常用的Array.prototype. slice.call(arguments)，一种异常笨拙的将arguments对象转换为数组的写法
+
+```js
+console.log(Array.of(1, 2, 3, 4)); // Array(4) [1, 2, 3, 4]
+console.log(Array.of(undefined)); // Array(1) [undefined]
+```
+
+
+
+#### 数组空位
+
+> 使用数组字面量初始化数组时，可以使用一串逗号来创建空位（hole）。ECMAScript会将逗号之间相应索引位置的值当成空位，ES6规范重新定义了该如何处理这些空位
+
+```js
+const arr = [, , , , ,];
+console.log(arr.length); // 5
+console.log(arr); // [ <5 empty items> ]
+```
+
+- ES6新增的方法和迭代器与早期ECMAScript版本中存在的方法行为不同
+- ES6新增方法普遍将这些空位当成存在的元素，只不过值为undefined
+- ES6之前的方法则会忽略这个空位，但具体的行为也会因方法而异
+- 由于行为不一致和存在性能隐患，因此实践中要避免使用数组空位
+- 如果确实需要空位，则可以显式地用undefined值代替
+
+```js
+function itemIsUndefined(arr) {
+    for (const item of arr) {
+        console.log("item 为空：", item === undefined);
+    }
+}
+
+const arr = [1, , , , 5];
+itemIsUndefined(arr); // false true true true false
+
+const arr2 = Array.from([, , ,]);
+itemIsUndefined(arr2); // true * 3
+
+console.log("map", arr.map(item  => item ** 2)); // map() 会直接忽略空位
+console.log("join", arr.join("-")); // join 会将空位视为空字符串
+```
+
+
+
+#### 数组索引
+
+> 要取得或设置数组的值，需要使用中括号并提供相应值的数字索引
+
+```js
+let colors = ["red", "yellow", "blue", "green"];
+console.log(colors[0]); // red
+colors[2] = "black"; // 修改数组
+colors[4] = "brown"; // 修改数组
+console.log(colors); // Array(5) ["red", "yellow", "black", "green", "brown"]
+```
+
+
+
+- 数组中元素的数量保存在length属性中，这个属性始终返回0或大于0的值
+- 数组length属性的独特之处在于，它不是只读的
+- 通过修改length属性，可以从数组末尾删除或添加元素
+- 使用length属性可以方便地向数组末尾添加元素
+
+```js
+let colors = ["red", "yellow", "blue", "green"];
+let names = [];
+console.log(colors.length); // 4
+console.log(names.length); // 0
+colors.length = 2;
+console.log(colors[2]); // undefined
+console.log(colors); // Array(2) ["red", "yellow"]
+
+colors = ["red", "yellow", "blue"];
+colors.length = 4;
+console.log(colors[3]); // undefined
+
+colors = ["red", "yellow", "blue"];
+colors[colors.length] = "black";
+colors[colors.length] = "brown";
+console.log(colors); // Array(5) ["red", "yellow", "blue", "black", "brown"
+
+colors = ["red", "yellow", "blue"];
+colors[99] = "black";
+// 这中间的所有元素，即位置3~98，实际上并不存在，因此在访问时会返回undefined
+console.log(colors); // Array(100) ["red", "yellow", "blue", "black"]
+```
+
+
+
+##### 最大索引
+
+- 数组最多可以包含 4294967295 个元素，这对于大多数编程任务应该足够了
+- 如果尝试添加更多项，则会导致抛出错误
+- 以这个最大值作为初始值创建数组，可能导致脚本运行时间过长的错误
+
+
+
+#### 检测数组（*instanceof* & *Array.isArray()*）
+
+- 在只有一个网页（因而只有一个全局作用域）的情况下，使用 *instanceof* 操作符就足矣
+  - 使用instanceof的问题是假定只有一个全局执行上下文
+- 如果网页里有多个框架，则可能涉及两个不同的全局执行上下文，因此就会有两个不同版本的Array构造函数
+- 如果要把数组从一个框架传给另一个框架，则这个数组的构造函数将有别于在第二个框架内本地创建的数组
+  - 为解决这个问题，ECMAScript提供了Array.isArray()方法
+  - 这个方法的目的就是确定一个值是否为数组，而不用管它是在哪个全局执行上下文中创建的
+- 当检测Array实例时, `Array.isArray` 优于 `instanceof`,因为Array.isArray能检测`iframes`
+
+```js
+let arr = [1, 2, 3, 4, 5];
+let arr2 = [1, undefined, null, "Test"];
+let str = "test";
+console.log("instanceof", arr instanceof Array); // instanceof true
+console.log("instanceof", arr2 instanceof Array); // instanceof true
+console.log("instanceof", str instanceof Array); // instanceof false
+
+console.log("Array.isArray", Array.isArray(arr)); // Array.isArray true
+console.log("Array.isArray", Array.isArray(arr2)); // Array.isArray true
+console.log("Array.isArray", Array.isArray(str)); // Array.isArray false
+```
+
+
+
+#### 迭代器方法（*keys()*, *values()*, *entries()*）
+
+> 在ES6中，Array的原型上暴露了3个用于检索数组内容的方法：keys()、values()和entries()
+>
+> 虽然这些方法是ES6规范定义的，但在2017年底的时候仍有浏览器没有实现它们
+
+- keys() 返回数组索引的迭代器
+- values() 返回数组元素的迭代器
+- entries() 返回索引/值对的迭代器
+
+```js
+let arr = ["item1", "item2", "item3", "item4"];
+
+console.log("keys>>>>>", Array.from(arr.keys())); // Array(4) [0, 1, 2, 3]
+console.log("values>>>>>", Array.from(arr.values())); // Array(4) ["item1", "item2", "item3", "item4"]
+console.log("entries>>>>>", Array.from(arr.entries())); // Array(4)  [ [ 0, 'item1' ], [ 1, 'item2' ], [ 2, 'item3' ], [ 3, 'item4' ] ]
+
+for (const [index, item] of arr.entries()) {
+    console.log("index", index);
+    console.log("item", item);
+}
+```
+
+
+
+#### 复制和填充方法（*copyWithin()* & *fill()*）
+
+> ES6新增了两个方法：批量复制方法copyWithin()，以及填充数组方法fill()。这两个方法的函数签名类似，都需要指定既有数组实例上的一个范围，包含开始索引，不包含结束索引。使用这个方法不会改变数组的大小
+
+
+
+##### *fill()*
+
+> 使用fill()方法可以向一个已有的数组中插入全部或部分相同的值
+
+- 开始索引用于指定开始填充的位置，它是可选的。如果不提供结束索引，则一直填充到数组末尾
+
+- 负值索引从数组末尾开始计算
+
+- 也可以将负索引想象成数组长度加上它得到的一个正索引
+
+- fill()静默忽略超出数组边界、零长度及方向相反的索引范围
+
+
+```js
+let arr = [1, 2, 3, 4, 5];
+
+console.log(arr.fill(6)); // Array(5) [6, 6, 6, 6, 6]
+console.log(arr); // Array(5) [6, 6, 6, 6, 6]
+
+arr = [1, 2, 3, 4, 5];
+
+// 填充索引 >= 3 的元素
+console.log(arr.fill(6, 3)); // Array(5) [1, 2, 3, 6, 6]
+
+arr = [1, 2, 3, 4, 5];
+
+// 填充 索引 1 - 3 （不包括3）的元素
+console.log(arr.fill(6, 1, 3)); // Array(5) [1, 6, 6, 4, 5]
+
+arr = [1, 2, 3, 4, 5];
+
+/*
+填充索引 1 - 4（不包括4）的元素
+1 = 5 - 4
+4 = 5 - 1
+ */
+console.log(arr.fill(6, -4, -1)); // Array(5) [1, 6, 6, 6, 5]
+
+arr = [1, 2, 3, 4, 5];
+// 忽略数组越界，索引过低以及反向问题
+console.log(arr.fill(6, -1, -4)); // Array(5) [1, 2, 3, 4, 5]
+console.log(arr.fill(6, 4, 10)); // Array(5) [1, 2, 3, 4, 6]
+```
+
+
+
+##### *copyWithin()*
+
+> `copyWithin()` 方法浅复制数组的一部分到同一数组中的另一个位置，并返回它，不会改变原数组的长度。
+
+- copyWithin()会按照指定范围浅复制数组中的部分内容，然后将它们插入到指定索引开始的位置
+- 开始索引和结束索引则与fill()使用同样的计算方法
+- copyWithin()静默忽略超出数组边界、零长度及方向相反的索引范围
+
+```js
+let ints,
+    reset = () => ints = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+reset();
+
+// 从 ints 中复制索引 0 开始的内容，插入到索引 5 开始的位置
+// 在索引或目标索引达到数组边界时停止
+ints.copyWithin(5);
+console.log(ints); // Array(10) [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+
+reset();
+ints.copyWithin(3);
+console.log(ints); // Array(10) [0, 1, 2, 0, 1, 2, 3, 4, 5, 6]
+
+// 从ints中复制索引5开始的内容，插入到索引0开始的位置
+reset();
+ints.copyWithin(0, 5);
+console.log(ints); // [5, 6, 7, 8, 9, 5, 6, 7, 8, 9]
+
+// 复制索引 0-3（不包括3） 的内容，插入到索引 4 开始的位置
+reset();
+ints.copyWithin(4, 0, 3);
+console.log(ints); // Array(10) [0, 1, 2, 3, 0, 1, 2, 7, 8, 9]
+```
+
+
+
+#### 转换方法（*toLocaleString()、toString()和valueOf()*）
+
+> 所有对象都有toLocaleString()、toString()和valueOf()方法
+
+- toString()返回由数组中每个值的等效字符串拼接而成的一个逗号分隔的字符串。也就是说，对数组的每个值都会调用其toString()方法，以得到最终的字符串
+- valueOf()返回的还是数组本身
+
+```js
+let arr = [1, 2, 3, null, undefined, "test"];
+
+console.log("toString>>>", arr.toString()); // 1,2,3,,,test
+console.log("toString>>>", typeof arr.toString()); // string
+console.log("valueOf>>>", arr.valueOf()); // [ 1, 2, 3, null, undefined, 'test' ]
+console.log("valueOf>>>", typeof arr.valueOf()); // object
+```
+
+
+
+- toLocaleString()方法也可能返回跟toString()和valueOf()相同的结果，但也不一定
+- 在调用数组的toLocaleString()方法时，会得到一个逗号分隔的数组值的字符串
+- 它与另外两个方法唯一的区别是，为了得到最终的字符串，会调用数组每个值的toLocaleString()方法，而不是toString()方法
+
+```html
+<script>
+    let person1 = {
+        toString() {
+            return "Jayce";
+        },
+        toLocaleString() {
+            return "Jayce Lan";
+        }
+    }
+
+    let person2 = {
+        toString() {
+            return "Eason";
+        },
+        toLocaleString() {
+            return "Eason Chan";
+        }
+    }
+
+    let persons = [person1, person2];
+    alert(persons); // Jayce,Eason
+    alert(persons.toString()); // Jayce,Eason
+    alert(persons.toLocaleString()); // Jayce Lan,Eason Chan
+</script>
+```
+
+
+
+- 这里定义了两个对象person1和person2，它们都定义了toString()和toLocaleString()方法，而且返回不同的值
+- 然后又创建了一个包含这两个对象的数组persons
+- 在将数组传给alert()时，输出的是"Jayce, Eason"，这是因为会在数组每一项上调用toString()方法（与下一行显式调用toString()方法结果一样）
+- 而在调用数组的toLocaleString()方法时，结果变成了"Jayce Lan, Eason Chan"，这是因为调用了数组每一项的toLocaleString()方法
+
+
+
+##### *join()*
+
+> `join()` 方法将一个数组（或一个类数组对象）的所有元素连接成一个字符串并返回这个字符串。如果数组只有一个项目，那么将返回该项目而不使用分隔符
+
+```js
+let arr = ["C", "Java", "JavaScript", "TypeScript"];
+
+console.log(arr.join("")); // CJavaJavaScriptTypeScript
+console.log(arr.join("-")); // C-Java-JavaScript-TypeScript
+console.log(arr.join("||")); // C||Java||JavaScript||TypeScript
+
+arr = [1, 2, 3, null, undefined, "test"];
+
+// 如果数组中某一项是null或undefined，则在join()、toLocaleString()、toString()和valueOf()返回的结果中会以空字符串表示
+console.log(arr.join("")); // 123test
+console.log(arr.join("-")); // 1-2-3---test
+console.log(arr.join("||")); // 1||2||3||||||test
+```
+
+
+
+##### 空字符串或 *undefined*
+
+如果数组中某一项是null或undefined，则在join()、toLocaleString()、toString()和valueOf()返回的结果中会以空字符串表示
+
