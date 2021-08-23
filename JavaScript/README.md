@@ -3221,3 +3221,335 @@ console.log(arr.join("||")); // 1||2||3||||||test
 
 如果数组中某一项是null或undefined，则在join()、toLocaleString()、toString()和valueOf()返回的结果中会以空字符串表示
 
+
+
+#### 栈方法
+
+> ECMAScript给数组提供几个方法，让它看起来像是另外一种数据结构。数组对象可以像栈一样，也就是一种限制插入和删除项的数据结构。栈是一种后进先出（LIFO, Last-In-First-Out）的结构，也就是最近添加的项先被删除。数据项的插入（称为推入，push）和删除（称为弹出，pop）只在栈的一个地方发生，即栈顶
+
+##### *push()*
+
+> push()方法接收任意数量的参数，并将它们添加到数组末尾，返回数组的最新长度
+
+```js
+let pushArr = new Array();
+let countPush = pushArr.push("red", "yellow");
+console.log(pushArr); // [ 'red', 'yellow' ]
+console.log(countPush); // 2
+
+let arr = ["black", "blue"];
+countPush = pushArr.push(arr);
+console.log(pushArr); // [ 'red', 'yellow', [ 'black', 'blue' ] ]
+console.log(countPush); // 3
+```
+
+
+
+##### *pop()*
+
+> pop()方法则用于删除数组的最后一项，同时减少数组的length值，返回被删除的项（当数组为空时返回 undefined ）
+
+```js
+let popArr = ["red", "blue", "yellow", "black"];
+let popItem = popArr.pop();
+
+console.log(popArr); // [ 'red', 'blue', 'yellow' ]
+console.log(popItem); // black
+```
+
+
+
+#### 队列方法
+
+> 队列以先进先出（FIFO, First-In-First-Out）形式限制访问。队列在列表末尾添加数据，但从列表开头获取数据
+
+##### *shift()*
+
+> `shift()` 方法从数组中删除**第一个**元素，并返回该元素的值。此方法更改数组的长度
+
+```js
+let arr = new Array();
+arr.push("red", "blue");
+arr.push("yellow");
+console.log(arr); // [ 'red', 'blue', 'yellow' ]
+
+let item = arr.shift();
+
+console.log(item); // red
+console.log(arr); // Array(2) ["blue", "yellow"]
+```
+
+
+
+##### *unshift()*
+
+> `unshift()` 方法将一个或多个元素添加到数组的**开头**，并返回该数组的**新长度(该**方法修改原有数组**)**
+
+```js
+let arr = ["red", "blue", "yellow"];
+
+let count = arr.unshift("black");
+
+console.log(count); // 4
+console.log(arr); // Array(4) ["black", "red", "blue", "yellow"]
+```
+
+
+
+#### 排序方法
+
+> 数组有两个方法可以用来对元素重新排序：reverse()和sort()
+
+##### *reverse()*
+
+> `reverse()` 方法将数组中元素的位置颠倒，并返回该数组。数组的第一个元素会变成最后一个，数组的最后一个元素变成第一个。**该方法会改变原数组**
+
+```js
+let arr = [1, 2, 3, 4, 5];
+console.log(arr); // Array(5) [1, 2, 3, 4, 5]
+
+arr.reverse();
+
+console.log(arr); // Array(5) [5, 4, 3, 2, 1]
+```
+
+
+
+##### *sort()*
+
+- sort()会按照升序重新排列数组元素，即最小的值在前面，最大的值在后面
+- 为此，sort()会在每一项上调用String()转型函数，然后比较字符串来决定顺序
+- 即使数组的元素都是数值，也会先把数组转换为字符串再比较、排序
+
+```js
+let arr = [1, 5, 8, 10, 2, 9];
+arr.sort();
+// 由于是匹配字符串，因此 '10' < '2'
+console.log('10' < '2'); // true
+console.log(arr); // Array(6) [1, 10, 2, 5, 8, 9]
+```
+
+
+
+- sort()方法可以接收一个比较函数，用于判断哪个值应该排在前面
+- 比较函数接收两个参数，如果第一个参数应该排在第二个参数前面，就返回负值
+- 如果两个参数相等，就返回0
+- 如果第一个参数应该排在第二个参数后面，就返回正值
+
+```js
+let arr,
+    reset = () => arr = [1, 5, 8, 10, 2, 9];
+reset();
+/**
+ * 比较两数大小，并传入sort中 使得数组由小到大排序
+ * @param num1
+ * @param num2
+ * @returns {number}
+ */
+function compare(num1, num2) {
+    if (num1 < num2) {
+        return -1;
+    }
+    if (num1 > num2) {
+        return 1;
+    }
+    return 0;
+}
+
+arr.sort(compare);
+console.log("排序后", arr); // Array(6) [1, 2, 5, 8, 9, 10]
+```
+
+
+
+- 如果希望由大到小排序，则需要把函数返回值对调
+
+```js
+/**
+ * 使得数组由大到小排序
+ * @param num1
+ * @param num2
+ * @returns {number}
+ */
+function compareReset(num1, num2) {
+    if (num1 < num2) {
+        return -1;
+    }
+    if (num1 > num2) {
+        return 1;
+    }
+    return 0;
+}
+```
+
+
+
+- 使用箭头函数优化
+- 比较函数就是要返回小于0、0和大于0的数值，因此减法操作完全可以满足要求
+
+```js
+let arr,
+    reset = () => arr = [1, 5, 8, 10, 2, 9];
+reset();
+arr.sort(compare);
+console.log("排序后", arr); // Array(6) [1, 2, 5, 8, 9, 10]
+
+// 将方法写成箭头函数
+reset();
+arr.sort((num1, num2) => (num1 < num2) ? 1 : (num1 > num2) ? -1 : 0);
+console.log(arr); // Array(6) [10, 9, 8, 5, 2, 1]
+
+// 进一步简化
+reset();
+arr.sort((num1, num2) => num1 - num2);
+console.log(arr); // Array(6) [1, 2, 5, 8, 9, 10]
+```
+
+
+
+- 处理对象
+
+```js
+let objs = [
+    {name: "Jayce", age: 25},
+    {name: "Eason", age: 47},
+    {name: "Jack", age: 24}
+];
+
+objs.sort((a, b) => a.age - b.age);
+for (const item of objs) {
+    console.log(item);
+}
+```
+
+
+
+#### 操作方法
+
+##### *concat()*
+
+>  `concat()` 方法用于合并两个或多个数组。此方法不会更改现有数组，而是返回一个新数组
+
+```js
+let arr = ["red", "blue", "yellow"];
+let concatArr = arr.concat("black", ["brown", "pink"]);
+console.log("arr", arr); // Array(3) ["red", "blue", "yellow"]
+console.log("concatArr", concatArr); // Array(6) ["red", "blue", "yellow", "black", "brown", "pink"]
+```
+
+
+
+- 打平数组参数的行为可以重写，方法是在参数数组上指定一个特殊的符号：*Symbol.isConcatSpreadable*
+- 这个符号能够阻止concat()打平参数数组
+- 相反，把这个值设置为true可以强制打平类数组对象
+
+```js
+let colors = ["red", "green", "blue"];
+let newColors = ["black", "brown"];
+let moreNewColors = {
+    [Symbol.isConcatSpreadable]: true,
+    length: 2,
+    0: "pink",
+    1: "cyan"
+};
+
+newColors[Symbol.isConcatSpreadable] = false;
+
+// 强制不打平数组
+let colors2 = colors.concat("yellow", newColors); // Array(5) ["red", "green", "blue", "yellow", Array(2)]
+// 强制打平数组对象
+let colors3 = colors.concat(moreNewColors); // Array(5) ["red", "green", "blue", "pink", "cyan"]
+console.log("colors2", colors2);
+console.log("colors3", colors3);
+```
+
+
+
+##### *slice()*
+
+> `slice()` 方法返回一个新的数组对象，这一对象是一个由 `begin` 和 `end` 决定的原数组的**浅拷贝**（包括 `begin`，不包括`end`）。原始数组不会被改变
+
+- 返回元素的开始索引和结束索引
+- 如果只有一个参数，则slice()会返回该索引到数组末尾的所有元素
+- 如果有两个参数，则slice()返回从开始索引到结束索引对应的所有元素，其中不包含结束索引对应的元素
+- 这个操作不影响原始数组
+- 如果slice()的参数有负值，那么就以数值长度加上这个负值的结果确定位置
+  - 比如，在包含5个元素的数组上调用slice(-2, -1)，就相当于调用slice(3,4)
+  - 如果结束位置小于开始位置，则返回空数组
+
+```js
+let arr = ["yellow", "red", "blue", "black", "pink"];
+let newArr1 = arr.slice(1);
+let newArr = arr.slice(1, 4);
+console.log(newArr1); // Array(4) ["red", "blue", "black", "pink"]
+console.log(newArr); // Array(3) ["red", "blue", "black"]
+
+console.log(arr.slice(-3, -1)); // Array(2) ["blue", "black"] 等同于 arr.slice(2, 4)
+console.log(arr.slice(4, 3)); // Array(0) []
+console.log(arr.slice(-1, -2)); // Array(0) []
+```
+
+
+
+##### *splice()*
+
+> 或许最强大的数组方法就属splice()了，使用它的方式可以有很多种
+>
+> **`splice()`** 方法通过删除或替换现有元素或者原地添加新的元素来修改数组,并以数组形式返回被修改的内容。此方法会改变原数组
+
+- **删除** 需要给splice()传2个参数：要删除的第一个元素的位置和要删除的元素数量。可以从数组中删除任意多个元素，比如splice(0, 2)会删除前两个元素
+- **插入** 需要给splice()传3个参数：开始位置、0（要删除的元素数量）和要插入的元素，可以在数组中指定的位置插入元素。第三个参数之后还可以传第四个、第五个参数，乃至任意多个要插入的元素。比如，splice(2, 0, "red","green")会从数组位置2开始插入字符串"red"和"green"
+- **替换** splice()在删除元素的同时可以在指定位置插入新元素，同样要传入3个参数：开始位置、要删除元素的数量和要插入的任意多个元素。要插入的元素数量不一定跟删除的元素数量一致。比如，splice(2, 1, "red", "green")会在位置2删除一个元素，然后从该位置开始向数组中插入"red"和"green"
+
+```js
+let arr,
+    reset = ()=> arr = [1, 2, 3, 4, 5];
+reset();
+console.log(arr);
+
+
+// 删除元素
+// 从索引 3 开始的位置删除2个元素
+arr.splice(3, 2);
+console.log(arr); // Array(3) [1, 2, 3]
+reset();
+arr.splice(-2, 1);
+console.log(arr); // 从索引 -2 （length - 2）删除一个元素 Array(4) [1, 2, 3, 5]
+
+// 无数组越界
+reset();
+arr.splice(3, 3);
+console.log(arr);
+reset();
+arr.splice(5, 1);
+console.log(arr);
+
+
+// 插入元素
+reset();
+arr.splice(2, 0, "item1", "item2");
+console.log(arr); // Array(7) [1, 2, "item1", "item2", 3, 4, 5] 从数组的 2索引处插入元素
+reset();
+const itemArr = [6, 7, 8];
+arr.splice(2, 0, itemArr);
+console.log(arr); // Array(6) [1, 2, Array(3), 3, 4, 5]
+
+
+// 替换元素（其实可以理解为先删除后添加）
+reset();
+arr.splice(3, 2, 6, 7 ,8);
+console.log(arr); // Array(6) [1, 2, 3, 6, 7, 8]
+reset();
+arr.splice(-3, 2, 6, 7 ,8);
+console.log(arr); // Array(6) [1, 2, 6, 7, 8, 5]
+
+// 添加
+reset();
+arr.splice(3, 0, 6, 7, 8);
+console.log(arr); // Array(8) [1, 2, 3, 6, 7, 8, 4, 5]
+```
+
+
+
+#### 搜索和位置方法
+
