@@ -3138,7 +3138,7 @@ console.log(ints); // Array(10) [0, 1, 2, 3, 0, 1, 2, 7, 8, 9]
 
 
 
-#### 转换方法（*toLocaleString()、toString()和valueOf()*）
+#### 转换方法（*toLocaleString()、toString()和 valueOf()*）
 
 > 所有对象都有toLocaleString()、toString()和valueOf()方法
 
@@ -3553,3 +3553,187 @@ console.log(arr); // Array(8) [1, 2, 3, 6, 7, 8, 4, 5]
 
 #### 搜索和位置方法
 
+> ECMAScript提供两类搜索数组的方法：按严格相等搜索和按断言函数搜索
+
+##### 严格相等
+
+> ECMAScript提供了3个严格相等的搜索方法：indexOf()、lastIndexOf()和includes()【es7】
+
+- 这些方法都接收两个参数：要查找的元素和一个可选的起始搜索位置
+- indexOf()和includes()方法从数组前头（第一项）开始向后搜索
+- 而lastIndexOf()从数组末尾（最后一项）开始向前搜索
+- 这些方法都接收两个参数：要查找的元素和一个可选的起始搜索位置
+- indexOf()和includes()方法从数组前头（第一项）开始向后搜索
+- 而lastIndexOf()从数组末尾（最后一项）开始向前搜索
+
+```js
+let arr = [1, 2, 3, 4, 5, 4, 3, 2, 1];
+// indexOf 正向查找
+console.log("indexOf", arr.indexOf(2)); // 1
+// 如果传入第二个参数，则从该索引开始查询，如果为负数，则从 arr.length + (负数) 开始查询
+console.log("indexOf", arr.indexOf(2, 2)); // 7
+console.log("indexOf", arr.indexOf(2, -2)); // 7
+
+// lastIndexOf 逆向查找
+console.log("lastIndexOf", arr.lastIndexOf(3)); // 6
+// 如果该值大于或等于数组的长度，则整个数组会被查找。
+// 如果为负值，将其视为从数组末尾向前的偏移。
+// 即使该值为负，数组仍然会被从后向前查找。如果该值为负时，其绝对值大于数组长度，则方法返回 -1，即数组不会被查找
+console.log("lastIndexOf", arr.lastIndexOf(3, 3)); // 2 (相当于只有前三位被查询)
+console.log("lastIndexOf", arr.lastIndexOf(3, -3)); // 6
+console.log("lastIndexOf", arr.lastIndexOf(3, -5)); // 2
+console.log("lastIndexOf", arr.lastIndexOf(3, -10)); // -1
+
+// includes
+console.log("includes", arr.includes(5)); // true
+// 从索引 3 开始查找
+console.log("includes", arr.includes(5, 3)); // true
+// 从索引 arr.length - 3 开始查找
+console.log("includes", arr.includes(5, -3)); // false
+```
+
+
+
+##### 断言函数
+
+> ECMAScript也允许按照定义的断言函数搜索数组，每个索引都会调用这个函数。断言函数的返回值决定了相应索引的元素是否被认为匹配
+
+- 断言函数接收3个参数：元素、索引和数组本身
+- 其中元素是数组中当前搜索的元素，索引是当前元素的索引，而数组就是正在搜索的数组
+- 断言函数返回真值，表示是否匹配
+- find()和findIndex()方法使用了断言函数
+- 这两个方法都从数组的最小索引开始
+- find()返回第一个匹配的元素，findIndex()返回第一个匹配元素的索引
+- 这两个方法也都接收第二个可选的参数，用于指定断言函数内部this的值
+- 找到匹配项后，这两个方法都不再继续搜索
+
+```js
+let arr = [1, 2, 3, 10, 9, 8, 5];
+// 返回实例
+console.log("find", arr.find(el => el > 9)); // 10
+// 返回索引
+console.log("findIndex", arr.findIndex(el => el > 9)); // 3
+
+// 用对象属性查找数组里的对象
+let objs = [
+    {name: "Jayce", age: 25},
+    {name: "Jack", age: 26},
+    {name: "Tom", age: 30}
+]
+function findAge(obj) {
+    return obj.age > 25;
+}
+console.log("find", objs.find(findAge)); // Object {name: "Jack", age: 26}
+console.log("findIndex", objs.findIndex(findAge)); // 1
+
+// 这里会进行三次迭代，可以理解为 while(arr[i] === 3)
+arr.find((el, index, array) => {
+    console.log(el);
+    console.log(index);
+    console.log(array);
+    return el === 3;
+}); 
+```
+
+
+
+#### 迭代方法
+
+> ECMAScript为数组定义了5个迭代方法。每个方法接收两个参数：以每一项为参数运行的函数，以及可选的作为函数运行上下文的作用域对象（影响函数中this的值）。传给每个方法的函数接收3个参数：数组元素、元素索引和数组本身。因具体方法而异，这个函数的执行结果可能会也可能不会影响方法的返回值
+
+
+
+- every()：对数组每一项都运行传入的函数，如果对每一项函数都返回true，则这个方法返回true
+- some()：对数组每一项都运行传入的函数，如果有一项函数返回true，则这个方法返回true
+- filter()：对数组每一项都运行传入的函数，函数返回true的项会组成数组之后返回
+- forEach()：对数组每一项都运行传入的函数，没有返回值
+- map()：对数组每一项都运行传入的函数，返回由每次函数调用的结果构成的数组
+
+
+
+> 除了抛出异常以外，没有办法中止或跳出 `forEach()` 循环
+
+```js
+let arr = [1, 2, 3, 4, 5];
+
+console.log("every", arr.every(item => item > 2)); // false
+console.log("every", arr.every(item => item > 0)); // true
+
+console.log(arr.some(item => item > 3)); // true
+console.log(arr.some(item => item > 5)); // false
+
+console.log("filter", arr.filter(item => item >2)); // Array(3) [3, 4, 5]
+console.log("filter", arr.filter(item => item >0)); // Array(5) [1, 2, 3, 4, 5]
+console.log("filter", arr.filter(item => item >5)); // Array(0) []
+
+arr.forEach(item => console.log(item)); // 遍历数组
+
+let itemArr = new Array();
+arr.forEach(item => itemArr.push(item + 3));
+console.log(itemArr); // Array(5) [4, 5, 6, 7, 8]
+console.log(arr); // Array(5) [1, 2, 3, 4, 5]
+
+arr.filter(item => item >2).forEach(item => console.log(item)); // 处理后循环
+
+
+let newArr = arr.map(item => item * 2);
+console.log(arr); // Array(5) [1, 2, 3, 4, 5]
+console.log(newArr); // Array(5) [2, 4, 6, 8, 10]
+
+// 使用map重新格式化数组中的对象
+
+let obj = [{key: 1, value: 10},
+    {key: 2, value: 20},
+    {key: 3, value: 30}];
+
+let reformattedArray = obj.map(item => {
+    let newObj = {};
+    newObj[item.key] = item.value;
+    return newObj;
+});
+
+/*
+{ key: 1, value: 10 }
+{ key: 2, value: 20 }
+{ key: 3, value: 30 }
+ */
+obj.forEach(item => console.log(item));
+
+/*
+{ '1': 10 }
+{ '2': 20 }
+{ '3': 30 }
+ */
+reformattedArray.forEach(item => console.log(item));
+```
+
+
+
+#### 归并方法
+
+> ECMAScript为数组提供了两个归并方法：reduce()和reduceRight()。这两个方法都会迭代数组的所有项，并在此基础上构建一个最终返回值
+
+- *reduce()* 方法从数组第一项开始遍历到最后一项
+- *reduceRight()* 从最后一项开始遍历至第一项
+- 这两个方法都接收两个参数：对每一项都会运行的归并函数，以及可选的以之为归并起点的初始值
+- 传给reduce()和reduceRight()的函数接收4个参数：上一个归并值、当前项、当前项的索引和数组本身
+- 究竟是使用reduce()还是reduceRight()，只取决于遍历数组元素的方向。除此之外，这两个方法没什么区别
+
+> reduce(acc, cur, idx, src)
+
+1. Accumulator (acc) (累计器)
+2. Current Value (cur) (当前值)
+3. Current Index (idx) (当前索引)
+4. Source Array (src) (源数组)
+
+```js
+let arr = [1, 2, 3, 4, 5];
+
+console.log(arr.reduce((acc, cur, idx, src) => acc + cur)); // 15
+console.log(arr.reduce((acc, cur) => acc + cur)); // 15 // 可以省略两位参数
+console.log(arr.reduceRight((acc, cur, idx, src) => acc + cur)); // 15
+```
+
+
+
+### 定型数组
