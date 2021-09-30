@@ -3737,3 +3737,56 @@ console.log(arr.reduceRight((acc, cur, idx, src) => acc + cur)); // 15
 
 
 ### 定型数组
+
+> 定型数组（typed array）是ECMAScript新增的结构，目的是提升向原生库传输数据的效率。实际上，JavaScript并没有“TypedArray”类型，它所指的其实是一种特殊的包含数值类型的数组
+>
+> Mozilla为解决这个问题而实现了CanvasFloatArray。这是一个提供JavaScript接口的、C语言风格的浮点值数组。JavaScript运行时使用这个类型可以分配、读取和写入数组。这个数组可以直接传给底层图形驱动程序API，也可以直接从底层获取到。最终，CanvasFloatArray变成了Float32Array，也就是今天定型数组中可用的第一个“类型”
+
+
+
+#### *ArrayBuffer*
+
+> Float32Array实际上是一种“视图”，可以允许JavaScript运行时访问一块名为ArrayBuffer的预分配内存。ArrayBuffer是所有定型数组及视图引用的基本单位
+
+- ArrayBuffer()是一个普通的JavaScript构造函数，可用于在内存中分配特定数量的字节空间
+- ArrayBuffer一经创建就不能再调整大小。不过，可以使用slice()复制其全部或部分到一个新实例中
+- ArrayBuffer某种程度上类似于C++的malloc()，但也有几个明显的区别
+  - malloc()在分配失败时会返回一个null指针。ArrayBuffer在分配失败时会抛出错误
+  - malloc()可以利用虚拟内存，因此最大可分配尺寸只受可寻址系统内存限制。ArrayBuffer分配的内存不能超过Number.MAX_SAFE_INTEGER（253-1）字节
+  - malloc()调用成功不会初始化实际的地址。声明ArrayBuffer则会将所有二进制位初始化为0
+  - 通过malloc()分配的堆内存除非调用free()或程序退出，否则系统不能再使用。而通过声明ArrayBuffer分配的堆内存可以被当成垃圾回收，不用手动释放
+- 不能仅通过对ArrayBuffer的引用就读取或写入其内容
+- 要读取或写入ArrayBuffer，就必须通过视图
+- 视图有不同的类型，但引用的都是ArrayBuffer中存储的二进制数据
+
+```js
+const buf = new ArrayBuffer(16); // 在内存分配16字节
+console.log(buf);
+/*
+ArrayBuffer {
+  [Uint8Contents]: <00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00>,
+  byteLength: 16
+}
+ */
+console.log(typeof buf); // object
+console.log(buf instanceof Array); // false
+console.log(buf.byteLength); // 16
+
+buf.byteLength = 15;
+console.log(buf.byteLength); // 16 一旦创建，无法改动
+const buf2 = buf.slice(2, 10);
+console.log(buf2.byteLength); // 8
+```
+
+
+
+#### *DataView*
+
+> 第一种允许你读写ArrayBuffer的视图是DataView。这个视图专为文件I/O和网络I/O设计，其API支持对缓冲数据的高度控制，但相比于其他类型的视图性能也差一些。DataView对缓冲内容没有任何预设，也不能迭代
+
+
+
+### Map
+
+> 作为ECMAScript 6的新增特性，Map是一种新的集合类型，为这门语言带来了真正的键/值存储机制。Map的大多数特性都可以通过Object类型实现，但二者之间还是存在一些细微的差异
+
