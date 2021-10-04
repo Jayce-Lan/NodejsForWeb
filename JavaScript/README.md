@@ -3790,3 +3790,166 @@ console.log(buf2.byteLength); // 8
 
 > 作为ECMAScript 6的新增特性，Map是一种新的集合类型，为这门语言带来了真正的键/值存储机制。Map的大多数特性都可以通过Object类型实现，但二者之间还是存在一些细微的差异
 
+
+
+#### 基本API
+
+> 使用 new 关键字和 Map 构造函数创建一个空映射
+
+```js
+const map = new Map();
+```
+
+> 如果想在创建的同时初始化实例，可以给Map构造函数传入一个可迭代对象，需要包含键/值对数组。可迭代对象中的每个键/值对都会按照迭代顺序插入到新映射实例中
+
+```js
+const m1 = new Map([
+    ["key1", "value1"],
+    ["key2", "value2"],
+    ["key3", "value3"]
+])
+console.log(m1.size);   // 3
+console.log(m1.get("key1"));    // value1
+```
+
+> 期待的键值对/获取键值对
+
+```js
+const map = new Map();
+const m1 = new Map([
+    ["key1", "value1"],
+    ["key2", "value2"],
+    ["key3", "value3"]
+])
+const m2 = new Map([[]])
+console.log(map.has(undefined)); // false
+console.log(m1.has(undefined)); // false
+console.log(m2.has(undefined)); // true
+console.log(m1.has("key3")); // trues
+console.log(m1.has("key4")); // false
+console.log(m1.get(undefined)); // undefined
+console.log(m2.get(undefined)); // undefined
+```
+
+
+
+- 初始化之后，可以使用set()方法再添加键/值对
+- 可以使用get()和has()进行查询
+- 可以通过size属性获取映射中的键/值对的数量
+- 还可以使用delete()和clear()删除值
+
+```js
+const map = new Map();
+console.log("赋值前", map.has("firstName")); // false
+console.log("赋值前", map.get("firstName")); // undefined
+console.log("赋值前", map.size); // 0
+
+// 添加元素
+map.set("firstName", "Jayce")
+    .set("lastName", "Lan")
+    .set("age", "26");
+
+console.log("赋值后", map.has("firstName")); // true
+console.log("赋值后", map.get("firstName")); // Jayce
+console.log("赋值后", map.size); // 3
+
+// 删除单个键值对
+map.delete("firstName");
+
+console.log("删除后", map.has("firstName")); // false
+console.log("删除后", map.has("lastName")); // true
+console.log("删除后", map.has("age")); // true
+console.log("删除后", map.get("firstName")); // undefined
+console.log("删除后", map.get("lastName")); // Lan
+console.log("删除后", map.get("age")); // 26
+console.log("删除后", map.size); // 2
+
+// 清理所有键值对
+map.clear()
+console.log(map.size); // 0
+```
+
+- 与Object只能使用数值、字符串或符号作为键不同，Map可以使用任何JavaScript数据类型作为键
+- Map内部使用SameValueZero比较操作（ECMAScript规范内部定义，语言中不能使用），基本上相当于使用严格对象相等的标准来检查键的匹配性
+  - SameValueZero比较也可能导致意想不到的冲突！
+- 与Object类似，映射的值是没有限制的
+
+
+
+#### 顺序与迭代
+
+> 与Object类型的一个主要差异是，Map实例会维护键值对的插入顺序，因此可以根据插入顺序执行迭代操作
+
+- 映射实例可以提供一个迭代器（Iterator），能以插入顺序生成[key, value]形式的数组
+- 可以通过entries()方法（或者Symbol.iterator属性，它引用entries()）取得这个迭代器
+
+```js
+const map = new Map([
+    ["key1", "value1"],
+    ["key2", "value2"],
+    ["key3", "value3"]
+]);
+
+console.log(map.entries === map[Symbol.iterator]);  // true
+
+for (let m of map.entries()) {
+    console.log(m);
+}
+
+for (let m of map[Symbol.iterator]()) {
+    console.log(m);
+}
+```
+
+
+
+- 因为entries()是默认迭代器，所以可以直接对映射实例使用扩展操作，把映射转换为数组
+
+```js
+const map = new Map([
+    ["key1", "value1"],
+    ["key2", "value2"],
+    ["key3", "value3"]
+]);
+
+// 直接扩展为数组
+let mapArr = [...map];
+console.log(mapArr); // [ [ 'key1', 'value1' ], [ 'key2', 'value2' ], [ 'key3', 'value3' ] ]
+```
+
+
+
+- 如果不使用迭代器，而是使用回调方式，则可以调用映射的forEach(callback,opt_thisArg)方法并传入回调，依次迭代每个键/值对
+- 传入的回调接收可选的第二个参数，这个参数用于重写回调内部this的值
+
+```js
+map.forEach((item, key) => console.log(`${key} => ${item}`));
+```
+
+
+
+- keys()和values()分别返回以插入顺序生成键和值的迭代器
+
+```js
+for (let key of map.keys()) {
+    console.log(key);
+}
+
+for (let value of map.values()) {
+    console.log(value);
+}
+```
+
+- 键和值在迭代器遍历时是可以修改的，但映射内部的引用则无法修改
+- 当然，这并不妨碍修改作为键或值的对象内部的属性，因为这样并不影响它们在映射实例中的身份
+
+
+
+#### 选择 *Map* 还是 *Object* 
+
+> 对于多数Web开发任务来说，选择Object还是Map只是个人偏好问题，影响不大。不过，对于在乎内存和性能的开发者来说，对象和映射之间确实存在显著的差别
+
+- 【内存占用】对于多数Web开发任务来说，选择Object还是Map只是个人偏好问题，影响不大。不过，对于在乎内存和性能的开发者来说，对象和映射之间确实存在显著的差别
+- 【插入性能】向Object和Map中插入新键/值对的消耗大致相当，不过插入Map在所有浏览器中一般会稍微快一点儿。对这两个类型来说，插入速度并不会随着键/值对数量而线性增加。如果代码涉及大量插入操作，那么显然Map的性能更佳
+- 【查找速度】与插入不同，从大型Object和Map中查找键/值对的性能差异极小，但如果只包含少量键/值对，则Object有时候速度更快。在把Object当成数组使用的情况下（比如使用连续整数作为属性），浏览器引擎可以进行优化，在内存中使用更高效的布局。这对Map来说是不可能的。对这两个类型而言，查找速度不会随着键/值对数量增加而线性增加。如果代码涉及大量查找操作，那么某些情况下可能选择Object更好一些
+- 【删除性能】使用delete删除Object属性的性能一直以来饱受诟病，目前在很多浏览器中仍然如此。为此，出现了一些伪删除对象属性的操作，包括把属性值设置为undefined或null。但很多时候，这都是一种讨厌的或不适宜的折中。而对大多数浏览器引擎来说，Map的delete()操作都比插入和查找更快。如果代码涉及大量删除操作，那么毫无疑问应该选择Map
