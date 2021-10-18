@@ -3786,7 +3786,7 @@ console.log(buf2.byteLength); // 8
 
 
 
-### Map
+### *Map*
 
 > 作为ECMAScript 6的新增特性，Map是一种新的集合类型，为这门语言带来了真正的键/值存储机制。Map的大多数特性都可以通过Object类型实现，但二者之间还是存在一些细微的差异
 
@@ -3953,3 +3953,111 @@ for (let value of map.values()) {
 - 【插入性能】向Object和Map中插入新键/值对的消耗大致相当，不过插入Map在所有浏览器中一般会稍微快一点儿。对这两个类型来说，插入速度并不会随着键/值对数量而线性增加。如果代码涉及大量插入操作，那么显然Map的性能更佳
 - 【查找速度】与插入不同，从大型Object和Map中查找键/值对的性能差异极小，但如果只包含少量键/值对，则Object有时候速度更快。在把Object当成数组使用的情况下（比如使用连续整数作为属性），浏览器引擎可以进行优化，在内存中使用更高效的布局。这对Map来说是不可能的。对这两个类型而言，查找速度不会随着键/值对数量增加而线性增加。如果代码涉及大量查找操作，那么某些情况下可能选择Object更好一些
 - 【删除性能】使用delete删除Object属性的性能一直以来饱受诟病，目前在很多浏览器中仍然如此。为此，出现了一些伪删除对象属性的操作，包括把属性值设置为undefined或null。但很多时候，这都是一种讨厌的或不适宜的折中。而对大多数浏览器引擎来说，Map的delete()操作都比插入和查找更快。如果代码涉及大量删除操作，那么毫无疑问应该选择Map
+
+
+
+### *WeakMap*
+
+> ECMAScript 6新增的“弱映射”（WeakMap）是一种新的集合类型，为这门语言带来了增强的键/值对存储机制。WeakMap是Map的“兄弟”类型，其API也是Map的子集。WeakMap中的“weak”（弱），描述的是JavaScript垃圾回收程序对待“弱映射”中键的方式
+
+#### *WeakMap API*
+
+- 可以使用 new 初始化一个新的  WeakMap
+
+```js
+const wm = new WeakMap();
+```
+
+
+
+- 弱映射中的键只能是Object或者继承自Object的类型，尝试使用非对象设置键会抛出TypeError
+- 值的类型没有限制
+- 如果想在初始化时填充弱映射，则构造函数可以接收一个可迭代对象，其中需要包含键/值对数组
+- 可迭代对象中的每个键/值都会按照迭代顺序插入新实例中
+
+```js
+const key1 = {id: 1},
+key2 = {id: 2},
+key3 = {id: 3};
+
+const wm1 = new WeakMap([
+    [key1, "value1"],
+    [key2, "value2"],
+    [key3, "value3"],
+]);
+
+console.log(wm1.get(key1)); // value1
+```
+
+
+
+- 初始化是全有或全无操作，只要有一个键无效，就会导致整个初始化失败
+
+```js
+const wm2 = new WeakMap([
+    [key1, "value1"],
+    ["TEST", "value2"],
+    [key3, "value3"]
+]); // Invalid value used as weak map key
+console.log(wm2.get(key1));
+
+// 希望使用 String 类型作为键的可以用以下写法：
+const TEST = new String("key4");
+const wm2 = new WeakMap([
+    [key1, "value1"],
+    [TEST, "value2"],
+    [key3, "value3"]
+]);
+console.log(wm2.get(TEST)); // value2
+console.log(wm2.get("key4")); // undefined
+```
+
+
+
+- 初始化之后可以使用set()再添加键/值对，可以使用get()和has()查询，还可以使用delete()删除
+- set()方法返回弱映射实例，因此可以把多个操作连缀起来，包括初始化声明
+
+```js
+const wm = new WeakMap().set(key1, "value1");
+```
+
+
+
+#### 弱键
+
+> WeakMap中“weak”表示弱映射的键是“弱弱地拿着”的。意思就是，这些键不属于正式的引用，不会阻止垃圾回收。但要注意的是，弱映射中值的引用可不是“弱弱地拿着”的。只要键存在，键/值对就会存在于映射中，并被当作对值的引用，因此就不会被当作垃圾回收
+
+- set()方法初始化了一个新对象并将它用作一个字符串的键
+- 因为没有指向这个对象的其他引用，所以当这行代码执行完成后，这个对象键就会被当作垃圾回收
+- 然后，这个键/值对就从弱映射中消失了，使其成为一个空映射
+- 在这个例子中，因为值也没有被引用，所以这对键/值被破坏以后，值本身也会成为垃圾回收的目标
+
+```js
+const wm = new WeakMap();
+wm.set({}, "value");
+
+console.log(wm.get({})); // undefined 由于是弱键的原因，对象没有被创建，因此被垃圾回收机制销毁了
+```
+
+
+
+- container对象维护着一个对弱映射键的引用，因此这个对象键不会成为垃圾回收的目标
+- 不过，如果调用了removeReference()，就会摧毁键对象的最后一个引用，垃圾回收程序就可以把这个键/值对清理掉
+
+```js
+const wm = new WeakMap();
+const container = {
+    key: {}
+}
+
+wm.set(container.key, "value");
+console.log(wm.get(container.key)); // value
+
+function removeReference() {
+    container.key = null;
+}
+
+removeReference();
+console.log(wm.get(container.key)); // undefined 由于key被销毁
+```
+
