@@ -4061,3 +4061,299 @@ removeReference();
 console.log(wm.get(container.key)); // undefined 由于key被销毁
 ```
 
+
+
+### *Set*
+
+> ECMAScript 6新增的Set是一种新集合类型，为这门语言带来集合数据结构。Set在很多方面都像是加强的Map，这是因为它们的大多数API和行为都是共有的
+
+#### 基本 *API*
+
+- 使用new关键字和Set构造函数可以创建一个空集合
+- 如果想在创建的同时初始化实例，则可以给Set构造函数传入一个可迭代对象，其中需要包含插入到新集合实例中的元素
+
+```js
+// 使用数组初始化集合
+const s1 = new Set(["value1", "value2", "value3"]);
+console.log(s1.size); // 3
+console.log(s1); // Set(3) { 'value1', 'value2', 'value3' }
+// 使用自定义迭代器初始化集合
+const s2 = new Set({
+    [Symbol.iterator] : function * () {
+        yield "value1";
+        yield "value2";
+        yield "value3";
+    }
+})
+console.log(s2.size); // 3
+console.log(s2); // Set(3) { 'value1', 'value2', 'value3' }
+```
+
+
+
+- 初始化之后，可以使用add()增加值，使用has()查询，通过size取得元素数量，以及使用delete()和clear()删除元素
+
+```js
+const s = new Set();
+console.log("初始化的 s.has(\"Jayce\")", s.has("Jayce")); // 初始化的 s.has("Jayce") false
+console.log("初始化的 s.size", s.size); // 初始化的 s.size 0
+console.log("初始化的 s", s); // 初始化的 s Set(0) {}
+
+// 为 Set 添加合集
+s.add("Jayce")
+    .add("Lan")
+    .add("jayce")
+    .add("Test")
+    .add("JavaScript");
+console.log("add后的 s.has(\"Jayce\")", s.has("Jayce")); // add后的 s.has("Jayce") true
+console.log("add后的 s.size", s.size); // add后的 s.size 5
+console.log("add后的 s", s); // add后的 s Set(5) { 'Jayce', 'Lan', 'jayce', 'Test', 'JavaScript' }
+
+// 删除单个合集
+s.delete("jayce");
+    // .delete("Test"); // TypeError: s.delete(...).delete is not a function 不能连续的 delete
+    
+console.log("delete后的 s.has(\"Jayce\")", s.has("Jayce")); // delete后的 s.has("Jayce") true
+console.log("delete后的 s.has(\"jayce\")", s.has("jayce")); // delete后的 s.has("jayce") false
+console.log("delete后的 s.size", s.size); // delete后的 s.size 4
+console.log("delete后的 s", s); // delete后的 s Set(4) { 'Jayce', 'Lan', 'Test', 'JavaScript' }
+
+// 销毁集合中的所有实例
+s.clear();
+console.log("clear后的 s", s); // clear后的 s Set(0) {}
+```
+
+
+
+- add()返回集合的实例，所以可以将多个添加操作连缀起来，包括初始化
+
+```js
+const s = new Set().add("Jayce")
+                    .add("Lan");
+    
+console.log(s); // Set(2) { 'Jayce', 'Lan' }
+```
+
+
+
+- 与Map类似，Set可以包含任何JavaScript数据类型作为值
+- 集合也使用SameValueZero操作（ECMAScript内部定义，无法在语言中使用），基本上相当于使用严格对象相等的标准来检查值的匹配性
+
+```js
+const s = new Set();
+const functionValue = function () {};
+const symbolValue = Symbol();
+const objValue = new Object();
+
+s.add(functionValue)
+    .add(symbolValue)
+    .add(objValue);
+
+console.log(s.has(functionValue)); // true
+console.log(s.has(symbolValue)); // true
+console.log(s.has(objValue)); // true
+
+// SameValueZero检查意味着独立的实例不会冲突
+console.log(s.has(function () {})); // false
+console.log(s); // Set(3) { [Function: functionValue], Symbol(), {} }
+```
+
+
+
+- 与严格相等一样，用作值的对象和其他“集合”类型在自己的内容或属性被修改时也不会改变
+
+```js
+const s = new Set();
+const obj = {},
+        arr = [];
+    
+s.add(obj).add(arr);
+
+console.log(s); // Set(2) { {}, [] }
+obj.bar = "bar";
+arr.push("bar"); 
+console.log(s); // Set(2) { { bar: 'bar' }, [ 'bar' ] }
+```
+
+
+
+- add()和delete()操作是幂等的。delete()返回一个布尔值，表示集合中是否存在要删除的值
+
+```js
+const s = new Set();
+s.add("foo");
+console.log(s.size); // 1
+s.add("foo");
+console.log(s.size); // 1
+console.log(s.delete("foo")); // true
+console.log(s.delete("foo")); // false
+```
+
+
+
+#### 顺序与迭代
+
+> Set会维护值插入时的顺序，因此支持按顺序迭代
+
+- 集合实例可以提供一个迭代器（Iterator），能以插入顺序生成集合内容
+- 可以通过values()方法及其别名方法keys()（或者Symbol.iterator属性，它引用values()）取得这个迭代器
+
+```js
+const s = new Set(["value1", "value2", "value3"]);
+    
+console.log(s.values === s[Symbol.iterator]); // true
+console.log(s.keys === s[Symbol.iterator]); // true
+
+for (let item of s.values()) {
+    console.log(item);
+}
+/**
+ * 结果均为：
+ * value1
+ * value2
+ * value3
+ */
+    
+for (let item of s[Symbol.iterator]()) {
+    console.log(item);
+}
+```
+
+
+
+- 因为values()是默认迭代器，所以可以直接对集合实例使用扩展操作，把集合转换为数组
+
+```js
+const s = new Set(["value1", "value2", "value3"]);
+let arr = [...s];
+console.log(arr); // [ 'value1', 'value2', 'value3' ]
+
+// 拓展
+s.clear();
+for (let i = 0; i < 4; i++) {
+    let obj = {
+        id: i.toString(),
+        name: `name${i}`
+    }
+    s.add(obj);
+}
+console.log(s);
+for (let item of s.values()) {
+    if (item.id === '2') {
+        item.name = `name${5}`
+    }
+    console.log(item);
+}
+console.log(s);
+```
+
+
+
+- 集合的entries()方法返回一个迭代器，可以按照插入顺序产生包含两个元素的数组，这两个元素是集合中每个值的重复出现
+
+```js
+const s = new Set(["value1", "value2", "value3"]);
+    
+for (let param of s.entries()) {
+    console.log(param);
+}
+/*
+[ 'value1', 'value1' ]
+[ 'value2', 'value2' ]
+[ 'value3', 'value3' ]
+*/
+```
+
+
+
+- 如果不使用迭代器，而是使用回调方式，则可以调用集合的forEach()方法并传入回调，依次迭代每个键/值对
+- 传入的回调接收可选的第二个参数，这个参数用于重写回调内部this的值
+
+```js
+const s = new Set(["value1", "value2", "value3"]);
+s.forEach((val, dupVal) => {
+    console.log(`${val} -> ${dupVal}`);
+});
+/* 
+value1 -> value1
+value2 -> value2
+value3 -> value3
+*/
+```
+
+
+
+- 修改集合中值的属性不会影响其作为集合值的身份
+
+```js
+const strSet = new Set(["value1"]);
+
+// 字符串原始值作为值不会被修改
+for (let value of strSet.values()) {
+    value = "newValue";
+    console.log("字符串本身", value); // 字符串本身 newValue
+    console.log("集合 strSet.has(\"value1\")", strSet.has("value1")); // 集合 strSet.has("value1") true
+    console.log("集合 strSet.has(\"newValue\")", strSet.has("newValue")); // 集合 strSet.has("newValue") false
+}
+const obj = {id: "1"};
+const objSet = new Set().add(obj);
+
+// 修改值对象的属性，但对象仍然存在于集合中
+for (let item of objSet.values()) {
+    item.id = "newValue";
+    console.log(item); // { id: 'newValue' }
+}
+console.log(objSet); // Set(1) { { id: 'newValue' } }
+console.log(objSet.has(obj)); // true
+```
+
+
+
+#### 定义正式集合操作
+
+> 从各方面来看，Set跟Map都很相似，只是API稍有调整，唯一需要强调的就是集合的API对自身的简单操作
+
+- 某些Set操作是有关联性的，因此最好让实现的方法能支持处理任意多个集合实例
+- Set保留插入顺序，所有方法返回的集合必须保证顺序
+- 尽可能高效地使用内存。扩展操作符的语法很简洁，但尽可能避免集合和数组间的相互转换能够节省对象初始化成本
+- 不要修改已有的集合实例。union(a, b)或a.union(b)应该返回包含结果的新集合实例。
+
+```js
+/*
+ * @Author: Jayce Lan
+ * @Date: 2021-11-04 10:27:15
+ * @Description: 重写Set
+ */
+
+class XSet extends Set {
+    union (...sets) {
+        return XSet.union(this, ...sets);
+    }
+
+    // 返回两个或多个集合的并集
+    static union (a, ...bSet) {
+        const unionSet = new XSet(a);
+        for (const b of bSet) {
+            for (const bValue of b) {
+                unionSet.add(bValue);
+            }
+        }
+        return unionSet;
+    }
+}
+
+
+const xs1 = new XSet();
+xs1.add("value1")
+xs1.add("value4");
+
+const xs2 = new XSet();
+xs2.add("value2")
+    .add("value1")
+    .add("value3");
+
+const xsAll = xs1.union(xs2);
+
+console.log(xsAll); // XSet(4) [Set] { 'value1', 'value4', 'value2', 'value3' }
+```
+
