@@ -4357,3 +4357,284 @@ const xsAll = xs1.union(xs2);
 console.log(xsAll); // XSet(4) [Set] { 'value1', 'value4', 'value2', 'value3' }
 ```
 
+
+
+### *WeakSet*
+
+> ECMAScript 6 新增的“弱集合”（WeakSet）是一种新的集合类型，为这门语言带来了集合数据结 构。WeakSet 是 Set 的“兄弟”类型，其 API 也是 Set 的子集。WeakSet 中的“weak”（弱），描述的 是 JavaScript 垃圾回收程序对待“弱集合”中值的方式
+
+
+
+#### 基本*API*
+
+- 可以使用 new 关键字实例化一个空的 WeakSet
+- 弱集合中的值只能是 Object 或者继承自 Object 的类型，尝试使用非对象设置值会抛出 TypeError
+-  如果想在初始化时填充弱集合，则构造函数可以接收一个可迭代对象，其中需要包含有效的值
+- 可迭代对象中的每个值都会按照迭代顺序插入到新实例中
+- 初始化之后可以使用 add()再添加新值，可以使用 has()查询，还可以使用 delete()删除
+- add()方法返回弱集合实例，因此可以把多个操作连缀起来，包括初始化声明
+
+```js
+// 使用 new 关键字实例化一个新的 WeakSet
+const ws1 = new WeakSet();
+
+const obj1 = {id: 1},
+      obj2 = {id: 2},
+      obj3 = {id: 3};
+
+// 使用数组初始化弱集合
+const ws2 = new WeakSet([obj1, obj2, obj3]);
+console.log(ws2.has(obj1)); // true
+console.log(ws2.has(obj2)); // true
+console.log(ws2.has(obj3)); // true
+
+// 初始化是一个全全有或全无的操作，只要有一个异常就会导致整个初始化失败
+// const ws3 = new WeakSet([obj1, "TEST", obj2]); // TypeError: Invalid value used in weak set
+
+// 原始值可以先包装为对象再作用该值
+const stringValue = new String("TEST");
+const ws3 = new WeakSet([obj1, stringValue, obj3]);
+console.log(ws3.has("TEST")); // false
+console.log(ws3.has(stringValue)); // true
+
+// 初始化之后使用 add() 再添加新值，可以使用 has() 查询，可以使用 delete() 删除
+const ws4 = new WeakSet();
+ws4.add(obj1)
+    .add(obj2);
+
+console.log(ws4.has(obj1)); // true
+console.log(ws4.has(obj2)); // true
+
+ws4.delete(obj1);
+console.log(ws4.has(obj1)); // false
+```
+
+
+
+#### 弱值
+
+- add()方法初始化了一个新对象，并将它用作一个值
+- 因为没有指向这个对象的其他引用，所以当 这行代码执行完成后，这个对象值就会被当作垃圾回收
+- 然后，这个值就从弱集合中消失了，使其成为 一个空集合
+
+```js
+const ws = new WeakSet();
+ws.add({});
+console.log(ws.has({})); // false
+```
+
+
+
+- 这一次，container 对象维护着一个对弱集合值的引用，因此这个对象值不会成为垃圾回收的目 标
+- 不过，如果调用了 removeReference()，就会摧毁值对象的最后一个引用，垃圾回收程序就可以 把这个值清理掉
+
+```js
+const ws = new WeakSet();
+ws.add({});
+console.log(ws.has({})); // false
+const contariner = {
+    value: {}
+}
+function removeValue() {
+    contariner.value = null;
+}
+ws.add(contariner.value);
+console.log(ws.has(contariner.value)); // true
+removeValue();
+console.log(ws.has(contariner.value)); // false
+```
+
+
+
+####  不可迭代值
+
+- 因为 WeakSet 中的值任何时候都可能被销毁，所以没必要提供迭代其值的能力
+- 当然，也用不着 像 clear()这样一次性销毁所有值的方法。WeakSet 确实没有这个方法
+- 因为不可能迭代，所以也不 可能在不知道对象引用的情况下从弱集合中取得值。即便代码可以访问 WeakSet 实例，也没办法看到 其中的内容
+- WeakSet 之所以限制只能用对象作为值，是为了保证只有通过值对象的引用才能取得值。如果允许原始值，那就没办法区分初始化时使用的字符串字面量和初始化之后使用的一个相等的字符串了
+
+
+
+## 迭代器与生成器
+
+> ECMAScript 6 规范新增了两个高 级特性：迭代器和生成器。使用这两个特性，能够更清晰、高效、方便地实现迭代
+
+### 理解迭代
+
+- 迭代之前需要事先知道如何使用数据结构
+- 遍历顺序并不是数据结构固有的
+
+
+
+### 迭代器模式
+
+> 迭代器模式（特别是在 ECMAScript 这个语境下）描述了一个方案，即可以把有些结构称为“可迭 代对象”（iterable），因为它们实现了正式的 Iterable 接口，而且可以通过迭代器 Iterator 消费
+
+#### 可迭代协议
+
+>  实现 Iterable 接口（可迭代协议）要求同时具备两种能力：支持迭代的自我识别能力和创建实现 Iterator 接口的对象的能力。在 ECMAScript 中，这意味着必须暴露一个属性作为“默认迭代器”，而 且这个属性必须使用特殊的 Symbol.iterator 作为键。这个默认迭代器属性必须引用一个迭代器工厂 函数，调用这个工厂函数必须返回一个新迭代器
+
+很多内置类型都实现了 `Iterator` 接口
+
+- 字符串
+- 数组
+- 映射
+- 集合
+- arguments 对象
+- NodeList 等 DOM 集合类型
+
+检查是否存在默认迭代器属性可以暴露这个工厂函数
+
+```html
+<script>
+    let num = 1;
+    let obj = {};
+    // 数字类型和对象类型没有实现迭代工厂函数
+    console.log(num[Symbol.iterator]); // undefined
+    console.log(obj[Symbol.iterator]); // undefined
+
+    let str = "abc";
+    let arr = ["a", "b", "c"];
+    let map = new Map().set("a", 1)
+        .set("b", 2)
+        .set("c", 3);
+    let set = new Set().add("a")
+        .add("b")
+        .add("c");
+    let els = document.querySelectorAll("div");
+
+    // 这些类型都实现了迭代器工厂函数
+    console.dir(str[Symbol.iterator]);
+    console.dir(arr[Symbol.iterator]);
+    console.dir(map[Symbol.iterator]);
+    console.dir(set[Symbol.iterator]);
+    console.dir(els[Symbol.iterator]);
+
+    // 调用这个工厂函数回生成一个迭代器
+    console.log(str[Symbol.iterator]()); // StringIterator {}
+    console.log(arr[Symbol.iterator]()); // Array Iterator {}
+    console.log(map[Symbol.iterator]()); // MapIterator {'a' => 1, 'b' => 2, 'c' => 3}
+    console.log(set[Symbol.iterator]()); // SetIterator {'a', 'b', 'c'}
+    console.log(els[Symbol.iterator]()); // Array Iterator {}
+</script>
+```
+
+
+
+实际写代码过程中，不需要显式调用这个工厂函数来生成迭代器。实现可迭代协议的所有类型都会 自动兼容接收可迭代对象的任何语言特性。接收可迭代对象的原生语言特性包括
+
+- `for-of` 循环
+- 数组解构
+- 扩展操作符
+- `Array.from()`
+- 创建集合
+- 创建映射 
+- `Promise.all()` 接收由期约组成的可迭代对象
+- `Promise.race()` 接收由期约组成的可迭代对象
+- `yield*` 操作符，在生成器中使用
+
+这些原生语言结构会在后台调用提供的可迭代对象的这个工厂函数，从而创建一个迭代器
+
+```js
+let arr = ["foo", "bar", "baz"];
+
+// for-of 循环
+for (let el of arr) {
+    console.log(el);
+}
+
+// 数组解构
+let [a, b, c] = arr;
+let [d, e] = arr;
+let [f, ...g] = arr;
+console.log(a, b, c); // foo bar baz
+console.log(d, e); // foo bar
+console.log(f, g); // foo [ 'bar', 'baz' ]
+
+// 扩展操作符
+let arr2 = [...arr];
+console.log(arr2); // [ 'foo', 'bar', 'baz' ]
+
+// Array.from()
+let arr3 = Array.from(arr);
+console.log(arr3); // [ 'foo', 'bar', 'baz' ]
+
+// Set 构造函数
+let set = new Set(arr);
+console.log(set); // Set(3) { 'foo', 'bar', 'baz' }
+
+// Map 构造函数
+let pairs = arr.map((item, index) => [item, index]);
+console.log(pairs); // [ [ 'foo', 0 ], [ 'bar', 1 ], [ 'baz', 2 ] ]
+let map = new Map(pairs);
+console.log(map); // Map(3) { 'foo' => 0, 'bar' => 1, 'baz' => 2 }
+
+// 如果对象原型链上的父类实现了 Iterable 接口，那这个对象也就实现了这个接口
+class FooArray extends Array {}
+let fooArray = new FooArray("foo", "bar", "baz");
+for (let item of fooArray) {
+    console.log(item);
+}
+```
+
+
+
+#### 迭代器协议
+
+- 迭代器是一种一次性使用的对象，用于迭代与其关联的可迭代对象
+- 迭代器 API 使用 next()方法 在可迭代对象中遍历数据
+- 每次成功调用 next()，都会返回一个 IteratorResult 对象，其中包含迭 代器返回的下一个值
+- 若不调用 next()，则无法知道迭代器的当前位置
+  - next()方法返回的迭代器对象 IteratorResult 包含两个属性：done 和 value
+  - done 是一个布 尔值，表示是否还可以再次调用 next()取得下一个值；value 包含可迭代对象的下一个值（done 为 false），或者 undefined（done 为 true）
+  - done: true 状态称为“耗尽”
+
+> 这里通过创建迭代器并调用 next()方法按顺序迭代了数组，直至不再产生新值。迭代器并不知道 怎么从可迭代对象中取得下一个值，也不知道可迭代对象有多大。只要迭代器到达 done: true 状态， 后续调用 next()就一直返回同样的值了
+
+```js
+// 可迭代对象
+let arr = ["foo", "bar", "baz"];
+// 迭代器
+let iter = arr[Symbol.iterator]();
+console.log(iter); // Object [Array Iterator] {}
+// 执行迭代
+console.log(iter.next()); // { value: 'foo', done: false }
+console.log(iter.next()); // { value: 'bar', done: false }
+console.log(iter.next()); // { value: 'baz', done: false }
+console.log(iter.next()); // { value: undefined, done: true }
+console.log(iter.next()); // { value: undefined, done: true }
+```
+
+
+
+> 每个迭代器都表示对可迭代对象的一次性有序遍历。不同迭代器的实例相互之间没有联系，只会独 立地遍历可迭代对象
+
+```js
+// 可迭代对象
+let arr = ["foo", "bar", "baz"];
+
+let iter1 = arr[Symbol.iterator]();
+let iter2 = arr[Symbol.iterator]();
+console.log(iter1.next()); // { value: 'foo', done: false }
+console.log(iter1.next()); // { value: 'bar', done: false }
+console.log(iter2.next()); // { value: 'foo', done: false }
+console.log(iter2.next()); // { value: 'bar', done: false }
+```
+
+
+
+> 迭代器并不与可迭代对象某个时刻的快照绑定，而仅仅是使用游标来记录遍历可迭代对象的历程。 如果可迭代对象在迭代期间被修改了，那么迭代器也会反映相应的变化
+
+```js
+// 可迭代对象
+let arr = ["foo", "bar", "baz"];
+
+// 迭代中插入元素
+let iterSplice = arr[Symbol.iterator]();
+console.log(iterSplice.next()); // { value: 'foo', done: false }
+arr.splice(1, 0, "testSplice");
+console.log(iterSplice.next()); // { value: 'testSplice', done: false }
+console.log(iterSplice.next()); // { value: 'bar', done: false }
+console.log(iterSplice.next()); // { value: 'baz', done: false }
+```
+
